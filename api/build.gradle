@@ -11,15 +11,13 @@ buildscript {
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.5.6'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
 }
 
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-group = 'arthur.kim.microservices.core'
+group = 'arthur.kim.microservices.api'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
@@ -29,7 +27,6 @@ repositories {
 
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {

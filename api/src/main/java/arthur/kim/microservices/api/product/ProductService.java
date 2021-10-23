@@ -1,4 +1,4 @@
-package arthur.kim.microservices.core.api.product;
+package arthur.kim.microservices.api.product;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
