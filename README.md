@@ -108,3 +108,7 @@ find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 ./gradlew build
 ```
 
+### api, util프로젝트는 각 프로젝트에서 빌드가 안되서 ide가 의미없음...
+
+### Gradle은 각 환경별 세팅을 맞추고 싶다면, gradle wrapper를 이용하면 좋다
+

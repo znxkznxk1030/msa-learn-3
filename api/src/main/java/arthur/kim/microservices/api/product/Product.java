@@ -1,4 +1,4 @@
-package arthur.kim.microservices.api.product;
+package arthur.kim.api.product;
 
 public class Product {
     private final int productId;
