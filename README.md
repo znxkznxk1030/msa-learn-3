@@ -112,3 +112,8 @@ find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 
 ### Gradle은 각 환경별 세팅을 맞추고 싶다면, gradle wrapper를 이용하면 좋다
 
+### 포트 죽이기
+
+```bash
+kill $(jobs -p)
+```

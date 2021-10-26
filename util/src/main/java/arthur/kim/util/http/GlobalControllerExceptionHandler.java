@@ -1,4 +1,4 @@
-package arthur.kim.microservices.util.http;
+package arthur.kim.util.http;
 
 public class GlobalControllerExceptionHandler {
 }

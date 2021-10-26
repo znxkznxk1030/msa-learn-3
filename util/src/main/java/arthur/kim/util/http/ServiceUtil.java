@@ -1,4 +1,4 @@
-package arthur.kim.microservices.util.http;
+package arthur.kim.util.http;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
