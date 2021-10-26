@@ -1,10 +1,10 @@
-package arthur.kim.microservices.core.productcompositeservice;
+package arthur.kim.microservices.core.recommendation.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ProductCompositeServiceApplicationTests {
+class RecommendationServiceApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,13 +1,13 @@
-package arthur.kim.microservices.core.reviewservice;
+package arthur.kim.microservices.core.recommendation.service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ReviewServiceApplication {
+public class RecommendationServiceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ReviewServiceApplication.class, args);
+		SpringApplication.run(RecommendationServiceApplication.class, args);
 	}
 
 }

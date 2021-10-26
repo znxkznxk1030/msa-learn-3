@@ -1,13 +1,14 @@
-package arthur.kim.microservices.core.reviewservice;
+package arthur.kim.microservices.core.product.composite.service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ReviewServiceApplicationTests {
+class ProductCompositeServiceApplicationTests {
 
 	@Test
 	void contextLoads() {
 	}
 
 }
+
