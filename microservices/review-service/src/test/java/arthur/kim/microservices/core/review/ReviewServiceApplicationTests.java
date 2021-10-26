@@ -1,4 +1,4 @@
-package arthur.kim.microservices.core.review.service;
+package arthur.kim.microservices.core.review;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

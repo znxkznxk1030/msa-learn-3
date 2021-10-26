@@ -1,4 +1,4 @@
-package arthur.kim.microservices.core.product.composite.service;
+package arthur.kim.microservices.core.product.composite;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
