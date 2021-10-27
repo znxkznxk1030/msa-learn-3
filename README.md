@@ -108,6 +108,20 @@ find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 ./gradlew build
 ```
 
+### 5. 마이크로 서비스 런
+```bash
+java -jar microservices/product-service/build/libs/product-service-0.0.1-SNAPSHOT.jar &
+
+java -jar microservices/product-composite-service/build/libs/product-composite-service-0.0.1-SNAPSHOT.jar &
+
+
+java -jar microservices/review-service/build/libs/review-service-0.0.1-SNAPSHOT.jar &
+
+java -jar microservices/recommendation-service/build/libs/recommendation-service-0.0.1-SNAPSHOT.jar &
+
+
+```
+
 ### api, util프로젝트는 각 프로젝트에서 빌드가 안되서 ide가 의미없음...
 
 ### Gradle은 각 환경별 세팅을 맞추고 싶다면, gradle wrapper를 이용하면 좋다
@@ -115,5 +129,5 @@ find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 ### 포트 죽이기
 
 ```bash
-kill $(jobs -p)
+kill $(jobs -p )
 ```

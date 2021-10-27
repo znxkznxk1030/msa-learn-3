@@ -8,7 +8,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@ComponentScan("arthur.kim.microservices")
+@ComponentScan("arthur.kim")
 public class ProductCompositeServiceApplication {
 
 	@Bean

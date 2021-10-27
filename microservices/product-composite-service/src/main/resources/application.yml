@@ -1,5 +1,10 @@
 server.port: 7000
 
+logging:
+  level:
+    root: INFO
+    arthur.kim: DEBUG
+
 app:
     product-service:
       host: localhost
@@ -9,4 +14,4 @@ app:
       port: 7002
     review-service:
       host: localhost
-      port: 7003
+      port: 7003₩
