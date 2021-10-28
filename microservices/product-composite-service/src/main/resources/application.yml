@@ -14,4 +14,4 @@ app:
       port: 7002
     review-service:
       host: localhost
-      port: 7003₩
+      port: 7003
