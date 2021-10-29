@@ -5,16 +5,16 @@
 ``` bash
 buildscript {
   ext {
-  	springBootVersion = '2.1.0.RC1'
+    springBootVersion = '2.1.0.RC1'
   }
   
   repositories {
-  	mavenCentral ()
-  	maven { url "https://repo.spring.io/snapshot"}
-  	maven { url "https://repo.spring.io/milestone"}
+    mavenCentral ()
+    maven { url "https://repo.spring.io/snapshot"}
+    maven { url "https://repo.spring.io/milestone"}
   }
   dependencies {
-  	classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
   }
 }
 
@@ -35,20 +35,18 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 test {
-	useJUnitPlatform()
+  useJUnitPlatform()
 }
 ```
-
-
 
 ###  커맨드로 각 마이크로서비스 빌드
 
@@ -58,10 +56,6 @@ cd microservices/product-composite-service; ./gradlew build; cd -; \
 cd microservices/recommendation-service; ./gradlew build; cd-; \
 cd microservices/review-service; ./gradlew build; cd-;
 ```
-
-
-
-
 
 ## 그래들에 멀티 프로젝트 빌드 설정
 
@@ -74,8 +68,6 @@ include ':microservices:recommendation-service'
 include ':microservices:product-composite-service'
 ```
 
-
-
 ### 2. Product-service 프로젝트에서 그래들 실행 파일을 복사
 
 ```bash
@@ -85,8 +77,6 @@ cp -r microservices/product-service/gradlew .; \
 cp -r microservices/product-service/gradlew.bat .; \
 cp -r microservices/product-service/.gitignore .; \
 ```
-
-
 
 ### 3. 각 프로젝트의 그래들 실행 파일 제거
 
@@ -100,7 +90,6 @@ cp -r microservices/product-service/.gitignore .; \
 find microservices -depth -name "gradle" -exec rm -rfv "{}" \;
 find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 ```
-
 
 ### 4. 하나의 커맨드로 전체 마이크로서비스 빌드
 
@@ -133,40 +122,42 @@ kill $(jobs -p )
 ```
 
 ### @RestControllerAdvice 를 이용해서 예외처리하기
+
 > @ExceptionHandler, @ModelAttribute, @InitBinder 가 적용된 메서드들을 AOP를 적용해 컨트롤러 단에 적용하기 위해 고안된 애너테이션
 
 
 ```java
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
-	private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
+  private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 
-	@ResponseStatus(NOT_FOUND)
-	@ExceptionHandler(NotFoundException.class)
-	public @ResponseBody HttpErrorInfo handleNotFoundExceptions(ServerHttpRequest request, Exception ex) {
-		return createHttpErrorInfo(NOT_FOUND, request, ex);
-	}
-	
-	@ResponseStatus(UNPROCESSABLE_ENTITY)
-	@ExceptionHandler(InvalidInputException.class)
-	public @ResponseBody HttpErrorInfo handelInvalidInputException(ServerHttpRequest request, Exception ex) {
-		
-		return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
-	}
-	
-	private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, ServerHttpRequest request, Exception ex) {
-		final String path = request.getPath().pathWithinApplication().value();
-		final String message = ex.getMessage();
-		
-		LOG.debug("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);
-		return new HttpErrorInfo(httpStatus, path, message);
-	}
+  @ResponseStatus(NOT_FOUND)
+  @ExceptionHandler(NotFoundException.class)
+  public @ResponseBody HttpErrorInfo handleNotFoundExceptions(ServerHttpRequest request, Exception ex) {
+    return createHttpErrorInfo(NOT_FOUND, request, ex);
+  }
+  
+  @ResponseStatus(UNPROCESSABLE_ENTITY)
+  @ExceptionHandler(InvalidInputException.class)
+  public @ResponseBody HttpErrorInfo handelInvalidInputException(ServerHttpRequest request, Exception ex) {
+    
+    return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
+  }
+  
+  private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, ServerHttpRequest request, Exception ex) {
+    final String path = request.getPath().pathWithinApplication().value();
+    final String message = ex.getMessage();
+      
+    LOG.debug("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);
+    return new HttpErrorInfo(httpStatus, path, message);
+  }
 
 }
 
 ```
 
 ### @ExceptionHandler
+
 > @Controller, @RestController가 적용된 Bean내에서 발생하는 예외를 잡아서 하나의 메서드에서 처리
 
 1. Controller, RestController에만 적용가능하다. (@Service같은 빈에서는 안됨.)
