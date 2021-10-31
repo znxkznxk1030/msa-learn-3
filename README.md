@@ -164,3 +164,11 @@ public class GlobalControllerExceptionHandler {
 2. 리턴 타입은 자유롭게 해도 된다. (Controller내부에 있는 메서드들은 여러 타입의 response를 할 것이다. 해당 타입과 전혀다른 리턴 타입이어도 상관없다.)
 3. @ExceptionHandler를 등록한 Controller에만 적용된다. 다른 Controller에서 NullPointerException이 발생하더라도 예외를 처리할 수 없다.
 4. 메서드의 파라미터로 Exception을 받아왔는데 이것 또한 자유롭게 받아와도 된다.
+
+
+### 테스트 목록
+
+```bash
+# 존재하지 않는 productId(13)를 조회하고 404(Not Found)가 반환되는지 검증
+curl http://localhost:7000/product-composite/13 -i
+```

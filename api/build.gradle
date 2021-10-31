@@ -17,7 +17,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 
-group = 'arthur.kim.microservices.api'
+group = 'arthur.kim.api'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 

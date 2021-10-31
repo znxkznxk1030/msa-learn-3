@@ -1,7 +1,12 @@
 package arthur.kim.util.exceptions;
 
 public class InvalidInputException extends RuntimeException {
-    public InvalidInputException() {
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public InvalidInputException() {
 
     }
 
