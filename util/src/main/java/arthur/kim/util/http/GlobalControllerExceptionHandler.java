@@ -35,7 +35,7 @@ public class GlobalControllerExceptionHandler {
 	private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, WebRequest request, Exception ex) {
 		LOG.info("request: {}", request);
 //		final String path = request.getPath().pathWithinApplication().value();
-		String path = request.getContextPath();
+		String path = request.getContextPath(); // TODO: 왜 ServerHttpRequest 넘기는 건 인스턴스 생성이 안되는 건지..
 		final String message = ex.getMessage();
 
 		LOG.info("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);

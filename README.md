@@ -172,3 +172,15 @@ public class GlobalControllerExceptionHandler {
 # 존재하지 않는 productId(13)를 조회하고 404(Not Found)가 반환되는지 검증
 curl http://localhost:7000/product-composite/13 -i
 ```
+
+### webflux 와 함께나온 WebTestClient는 요청을 보내고 결과를 검증하는 다양한 API를 제공한다.
+
+
+### Testcase 에서 안되는 점들
+#### junit 5에서는 @RunWith(SpringRunner.class) 를 사용하지 않는다.
+
+#### junit 5에서는 @Before 대신 @BeforeAll 또는 @BeforeEach
+
+#### WebEnvironment.RANDOM_PORT 는 restTemplate을 테스트하기 위함. ( Default는 WebEnvironment.MOCK )
+
+
