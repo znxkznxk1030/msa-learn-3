@@ -6,12 +6,11 @@ import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
 
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
@@ -20,26 +19,16 @@ import arthur.kim.util.exceptions.NotFoundException;
 public class GlobalControllerExceptionHandler {
 	private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 
-	@ResponseStatus(NOT_FOUND)
-	@ExceptionHandler(value = NotFoundException.class)
-	public @ResponseBody HttpErrorInfo handleNotFoundException(Exception ex, WebRequest request) {
-		return createHttpErrorInfo(NOT_FOUND, request, ex);
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseBody
+	public ResponseEntity<?> handleNotFoundException(Exception ex) {
+		return new ResponseEntity<>(ex, HttpStatus.NOT_FOUND);
 	}
 
-	@ResponseStatus(UNPROCESSABLE_ENTITY)
-	@ExceptionHandler(value = InvalidInputException.class)
-	public @ResponseBody HttpErrorInfo handleInvalidInputException(Exception ex, WebRequest request) {
-		return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
-	}
-
-	private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, WebRequest request, Exception ex) {
-		LOG.info("request: {}", request);
-//		final String path = request.getPath().pathWithinApplication().value();
-		String path = request.getContextPath(); // TODO: 왜 ServerHttpRequest 넘기는 건 인스턴스 생성이 안되는 건지..
-		final String message = ex.getMessage();
-
-		LOG.info("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);
-		return new HttpErrorInfo(httpStatus, path, message);
+	@ExceptionHandler(InvalidInputException.class)
+	@ResponseBody
+	public ResponseEntity<?> handleInvalidInputException(Exception ex) {
+		return new ResponseEntity<>(ex, HttpStatus.UNPROCESSABLE_ENTITY);
 	}
 
 }

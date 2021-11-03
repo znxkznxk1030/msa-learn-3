@@ -183,4 +183,83 @@ curl http://localhost:7000/product-composite/13 -i
 
 #### WebEnvironment.RANDOM_PORT 는 restTemplate을 테스트하기 위함. ( Default는 WebEnvironment.MOCK )
 
+#### Test 검증에 실패한 케이스의 경우 build시 오류로 출력된다. ( + 빌드 실패 )
+``` bash
+> Task :microservices:product-composite-service:test
 
+ProductCompositeServiceApplicationTests > getProductId() FAILED
+    java.lang.AssertionError: JSON path "$.recommendations.length()" expected:<0> but was:<1>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.util.JsonPathExpectationsHelper.assertValue(JsonPathExpectationsHelper.java:125)
+        at org.springframework.test.web.reactive.server.JsonPathAssertions.isEqualTo(JsonPathAssertions.java:54)
+        at arthur.kim.microservices.core.product.composite.ProductCompositeServiceApplicationTests.getProductId(ProductCompositeServiceApplicationTests.java:57)
+
+4 tests completed, 1 failed
+Finished generating test XML results (0.025 secs) into: /Users/yskim/Desktop/msa-learn/microservices/product-composite-service/build/test-results/test
+Generating HTML test report...
+Finished generating test html results (0.021 secs) into: /Users/yskim/Desktop/msa-learn/microservices/product-composite-service/build/reports/tests/test
+
+> Task :microservices:product-composite-service:test FAILED
+:microservices:product-composite-service:test (Thread[Execution worker for ':' Thread 7,5,main]) completed. Took 12.034 secs.
+
+FAILURE: Build failed with an exception.
+```
+
+- Test Result Dashboard
+
+> file:///Users/yskim/Desktop/msa-learn/microservices/product-composite-service/build/reports/tests/test/index.html
+
+#### 책에 나온 @ExceptionHandler 는 거의 동작하지 않는다. 아래와 같이 수정해서 테스트 하였다.
+
+- GlobalControllerExceptionHandler.java
+```java
+@RestControllerAdvice
+public class GlobalControllerExceptionHandler {
+	private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
+
+	@ExceptionHandler(NotFoundException.class)
+	@ResponseBody
+	public ResponseEntity<?> handleNotFoundException(Exception ex) {
+		return new ResponseEntity<>(ex, HttpStatus.NOT_FOUND);
+	}
+
+	@ExceptionHandler(InvalidInputException.class)
+	@ResponseBody
+	public ResponseEntity<?> handleInvalidInputException(Exception ex) {
+		return new ResponseEntity<>(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+	}
+
+}
+
+```
+
+- ProductCompositeServiceApplicationTests.java
+
+```java
+    @Test
+    public void getProductNotFound() {
+    	client.get()
+    		.uri("/product-composite/" + PRODUCT_ID_NOT_FOUND)
+    		.accept(MediaType.APPLICATION_JSON)
+    		.exchange()
+    		.expectStatus().isNotFound()
+    		.expectHeader().contentType(MediaType.APPLICATION_JSON)
+    		.expectBody()
+//    		.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
+    		.jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
+    }
+    
+    @Test
+    public void getProductInvalidInput() {
+    	client.get()
+    		.uri("/product-composite/" + PRODUCT_ID_INVALID)
+    		.accept(MediaType.APPLICATION_JSON)
+    		.exchange()
+    		.expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+    		.expectHeader().contentType(MediaType.APPLICATION_JSON)
+    		.expectBody()
+//    		.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
+    		.jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
+    }
+```
