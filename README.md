@@ -1,6 +1,6 @@
-## Chapter 3
+# Chapter 3
 
-### gradle 설정
+## gradle 설정
 
 ``` bash
 buildscript {
@@ -26,8 +26,6 @@ apply plugin: 'io.spring.dependency-managerment'
 
 - 스프링 부트 버전은 spring init 커맨드를 실행할 때 지정한 것으로 설정
 - 스프링 프로젝트 저장소를 추가한 이유는 정식버전이 아닌 버전 (2.1.0.RC1)의 라이브러리는 중앙 메이븐 저장소에 없기 때문이다.
-
-
 
 ```bash
 group = 'arthur.kim.microservices.core'
@@ -98,6 +96,7 @@ find microservices -depth -name "gradlew" -exec rm -fv "{}" \;
 ```
 
 ### 5. 마이크로 서비스 런
+
 ```bash
 java -jar microservices/product-service/build/libs/product-service-0.0.1-SNAPSHOT.jar &
 
@@ -111,7 +110,7 @@ java -jar microservices/recommendation-service/build/libs/recommendation-service
 
 ```
 
-### api, util프로젝트는 각 프로젝트에서 빌드가 안되서 ide가 의미없음...
+### api, util프로젝트는 각 프로젝트에서 빌드가 안되서 ide가 의미없음
 
 ### Gradle은 각 환경별 세팅을 맞추고 싶다면, gradle wrapper를 이용하면 좋다
 
@@ -124,7 +123,6 @@ kill $(jobs -p )
 ### @RestControllerAdvice 를 이용해서 예외처리하기
 
 > @ExceptionHandler, @ModelAttribute, @InitBinder 가 적용된 메서드들을 AOP를 적용해 컨트롤러 단에 적용하기 위해 고안된 애너테이션
-
 
 ```java
 @RestControllerAdvice
@@ -165,7 +163,6 @@ public class GlobalControllerExceptionHandler {
 3. @ExceptionHandler를 등록한 Controller에만 적용된다. 다른 Controller에서 NullPointerException이 발생하더라도 예외를 처리할 수 없다.
 4. 메서드의 파라미터로 Exception을 받아왔는데 이것 또한 자유롭게 받아와도 된다.
 
-
 ### 테스트 목록
 
 ```bash
@@ -173,17 +170,18 @@ public class GlobalControllerExceptionHandler {
 curl http://localhost:7000/product-composite/13 -i
 ```
 
-### webflux 와 함께나온 WebTestClient는 요청을 보내고 결과를 검증하는 다양한 API를 제공한다.
-
+### webflux 와 함께나온 WebTestClient는 요청을 보내고 결과를 검증하는 다양한 API를 제공한다
 
 ### Testcase 에서 안되는 점들
-#### junit 5에서는 @RunWith(SpringRunner.class) 를 사용하지 않는다.
+
+#### junit 5에서는 @RunWith(SpringRunner.class) 를 사용하지 않는다
 
 #### junit 5에서는 @Before 대신 @BeforeAll 또는 @BeforeEach
 
 #### WebEnvironment.RANDOM_PORT 는 restTemplate을 테스트하기 위함. ( Default는 WebEnvironment.MOCK )
 
 #### Test 검증에 실패한 케이스의 경우 build시 오류로 출력된다. ( + 빌드 실패 )
+
 ``` bash
 > Task :microservices:product-composite-service:test
 
@@ -210,25 +208,26 @@ FAILURE: Build failed with an exception.
 
 > file:///Users/yskim/Desktop/msa-learn/microservices/product-composite-service/build/reports/tests/test/index.html
 
-#### 책에 나온 @ExceptionHandler 는 거의 동작하지 않는다. 아래와 같이 수정해서 테스트 하였다.
+####  책에 나온 @ExceptionHandler 는 거의 동작하지 않는다. 아래와 같이 수정해서 테스트 하였다
 
 - GlobalControllerExceptionHandler.java
+
 ```java
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
-	private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
+ private static final Logger LOG = LoggerFactory.getLogger(GlobalControllerExceptionHandler.class);
 
-	@ExceptionHandler(NotFoundException.class)
-	@ResponseBody
-	public ResponseEntity<?> handleNotFoundException(Exception ex) {
-		return new ResponseEntity<>(ex, HttpStatus.NOT_FOUND);
-	}
+ @ExceptionHandler(NotFoundException.class)
+ @ResponseBody
+ public ResponseEntity<?> handleNotFoundException(Exception ex) {
+  return new ResponseEntity<>(ex, HttpStatus.NOT_FOUND);
+ }
 
-	@ExceptionHandler(InvalidInputException.class)
-	@ResponseBody
-	public ResponseEntity<?> handleInvalidInputException(Exception ex) {
-		return new ResponseEntity<>(ex, HttpStatus.UNPROCESSABLE_ENTITY);
-	}
+ @ExceptionHandler(InvalidInputException.class)
+ @ResponseBody
+ public ResponseEntity<?> handleInvalidInputException(Exception ex) {
+  return new ResponseEntity<>(ex, HttpStatus.UNPROCESSABLE_ENTITY);
+ }
 
 }
 
@@ -239,27 +238,27 @@ public class GlobalControllerExceptionHandler {
 ```java
     @Test
     public void getProductNotFound() {
-    	client.get()
-    		.uri("/product-composite/" + PRODUCT_ID_NOT_FOUND)
-    		.accept(MediaType.APPLICATION_JSON)
-    		.exchange()
-    		.expectStatus().isNotFound()
-    		.expectHeader().contentType(MediaType.APPLICATION_JSON)
-    		.expectBody()
-//    		.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
-    		.jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
+     client.get()
+      .uri("/product-composite/" + PRODUCT_ID_NOT_FOUND)
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isNotFound()
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+//      .jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
+      .jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
     }
     
     @Test
     public void getProductInvalidInput() {
-    	client.get()
-    		.uri("/product-composite/" + PRODUCT_ID_INVALID)
-    		.accept(MediaType.APPLICATION_JSON)
-    		.exchange()
-    		.expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
-    		.expectHeader().contentType(MediaType.APPLICATION_JSON)
-    		.expectBody()
-//    		.jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
-    		.jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
+     client.get()
+      .uri("/product-composite/" + PRODUCT_ID_INVALID)
+      .accept(MediaType.APPLICATION_JSON)
+      .exchange()
+      .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
+      .expectHeader().contentType(MediaType.APPLICATION_JSON)
+      .expectBody()
+//      .jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
+      .jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
     }
 ```
