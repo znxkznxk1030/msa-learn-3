@@ -245,7 +245,6 @@ public class GlobalControllerExceptionHandler {
       .expectStatus().isNotFound()
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
       .expectBody()
-//      .jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_NOT_FOUND)
       .jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
     }
     
@@ -258,7 +257,112 @@ public class GlobalControllerExceptionHandler {
       .expectStatus().isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY)
       .expectHeader().contentType(MediaType.APPLICATION_JSON)
       .expectBody()
-//      .jsonPath("$.path").isEqualTo("/product-composite/" + PRODUCT_ID_INVALID)
       .jsonPath("$.message").isEqualTo("INVALID: " + PRODUCT_ID_INVALID);
     }
+```
+
+### bash script로 통합 테스트 하기
+
+#### assertCurl()
+
+``` bash
+
+```
+
+#### curl | -w 옵션
+
+> -w, --write-out FORMAT <format>
+
+- 응답에서 포맷에 맞는 데이터를 출력할 수 있다.
+- %{variable_name} 과 같은 식으로 출력할 수 있다.
+- content_type, http_code, time_total 등의 정보를 출력할 수 있다.
+
+#### curl | -s 옵션
+
+> -s, --silent
+
+- 프로그레스나 에러 정보를 보여주지 않는다.
+
+#### local
+
+> 선언된 변수는 기본적으로 전역 변수(global variable)다. 단 함수 안에서만 지역 변수(local variable)를 사용할 수 있는데 사용할려면 변수 명 앞에 local을 붙여주면 된다.
+
+#### ${#변수}
+
+> 문자열 길이(예: echo ${#string})
+
+
+#### ${변수%단어}
+
+> 변수의 뒷부분부터 짧게 일치한 단어 삭제(예: echo ${string%b*c})
+
+``` bash
+string="abc-efg-123-abc"
+echo ${string%b*c} # abc-efg-123-a
+echo ${string%???} # abc-efg-123-
+```
+
+#### assertEqual()
+
+``` bash
+
+```
+
+#### ./bash-test.bash: Permission denied
+
+``` bash
+chmod u+x ./bash-test.bash
+```
+
+
+#### curl | 결과값
+
+> curl http://localhost:7000/product-composite/1 -s -w "%{http_code}"
+```json
+{
+  "productId": 1,
+  "name": "name-1",
+  "weight": 123,
+  "recommendations": [
+    {
+      "recommendationId": 1,
+      "author": "Author 1",
+      "rate": 1
+    },
+    {
+      "recommendationId": 2,
+      "author": "Author 2",
+      "rate": 2
+    },
+    {
+      "recommendationId": 3,
+      "author": "Author 3",
+      "rate": 3
+    }
+  ],
+  "reviews": [
+    {
+      "reviewId": 1,
+      "author": "Author 1",
+      "subject": "Subject 1"
+    },
+    {
+      "reviewId": 2,
+      "author": "Author 2",
+      "subject": "Subject 2"
+    },
+    {
+      "reviewId": 3,
+      "author": "Author 3",
+      "subject": "Subject 3"
+    }
+  ],
+  "serviceAddresses": {
+    "cmp": "yskimui-MacBook-Pro.local/218.38.137.27:7000",
+    "pro": "yskimui-MacBook-Pro.local/218.38.137.27:7001",
+    "rev": "yskimui-MacBook-Pro.local/218.38.137.27:7003",
+    "rec": "yskimui-MacBook-Pro.local/218.38.137.27:7002"
+  }
+}
+200
 ```
