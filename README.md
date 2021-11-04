@@ -266,7 +266,47 @@ public class GlobalControllerExceptionHandler {
 #### assertCurl()
 
 ``` bash
+function assertCurl() {
+  
+  local expectedHttpCode=$1
+  local curlCmd="$2 -w\"%{http_code}\""
+  local result=$(eval $curlCmd)
+  local httpCode="${result:(-3)}"
+  RESPONSE='' && (( ${#result} > 3 )) && RESPONSE="${result%???}"
 
+  if [ "$httpCode" = "$expectedHttpCode" ]
+  then
+    if [ "$httpCode" = "200" ]
+    then
+      echo "Test OK (HTTP Code: $httpCode)"
+    else
+      echo "Test OK (HTTP Code: $httpCode, $RESPONSE)"
+    fi
+  else
+      echo "Test FAILED, EXPECTED HTTP Code: $expectedHttpCode, GOT: $httpCode, WILL ABORT!"
+      echo "- Failing command: $curlCmd"
+      echo "- Response Body: $RESPONSE"
+      exit 1
+  fi
+}
+```
+
+#### assertEqual()
+
+``` bash
+function assertEqual() {
+
+  local expected=$1
+  local actual=$2
+
+  if [ "$actual" = "$expected" ]
+  then
+    echo "Test OK (actual value: $actual)"
+  else
+    echo "Test FAILED, EXPECTED VALUE: $expected, ACTUAL VALUE: $actual, WILL ABORT"
+    exit 1
+  fi
+}
 ```
 
 #### curl | -w 옵션
@@ -302,16 +342,15 @@ echo ${string%b*c} # abc-efg-123-a
 echo ${string%???} # abc-efg-123-
 ```
 
-#### assertEqual()
-
-``` bash
-
-```
-
 #### ./bash-test.bash: Permission denied
 
 ``` bash
-chmod u+x ./bash-test.bash
+chmod u+x ./bash-test.bash 
+# u stands for user.
+# g stands for group.
+# o stands for others.
+# a stands for all. ( default )
+# chmod +x {filename} | you'll make it executable.
 ```
 
 
