@@ -1,6 +1,8 @@
-# Chapter 3
+# Hands-On Microservices with Spring Boot And Spring Cloud
 
-## gradle 설정
+## Chapter 3
+
+### gradle 설정
 
 ``` bash
 buildscript {
@@ -331,7 +333,6 @@ function assertEqual() {
 
 > 문자열 길이(예: echo ${#string})
 
-
 #### ${변수%단어}
 
 > 변수의 뒷부분부터 짧게 일치한 단어 삭제(예: echo ${string%b*c})
@@ -353,10 +354,10 @@ chmod u+x ./bash-test.bash
 # chmod +x {filename} | you'll make it executable.
 ```
 
-
 #### curl | 결과값
 
-> curl http://localhost:7000/product-composite/1 -s -w "%{http_code}"
+> curl <http://localhost:7000/product-composite/1> -s -w "%{http_code}"
+
 ```json
 {
   "productId": 1,
@@ -405,3 +406,37 @@ chmod u+x ./bash-test.bash
 }
 200
 ```
+
+## Chapter 4
+
+### 첫 도커 명령 실행
+
+```bash
+docker fun -it --rm ubuntu
+```
+
+#### -it
+
+- 터미널을 통해 컨테이너와 상호작용
+
+#### --rm
+
+- 테미널 세션을 마치면 종료하도록 설정
+
+### 컨테이너 모두 제거
+
+```bash
+docker rm -f $(docker ps -aq)
+```
+
+#### -a
+
+- 실행 중 이거나, 중지된 컨테이너의 ID를 출력
+
+#### -q
+
+- 커맨드의 출력을 정리하고 컨테이너 ID만 남긴다.
+
+### 도커에서 자바를 실행할 때의 문제
+
+- 9 버전 이하의 자바에서는 리눅스 cgroup으로 지정한 자원 할당량을 무시했었음
