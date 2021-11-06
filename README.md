@@ -440,3 +440,58 @@ docker rm -f $(docker ps -aq)
 ### 도커에서 자바를 실행할 때의 문제
 
 - 9 버전 이하의 자바에서는 리눅스 cgroup으로 지정한 자원 할당량을 무시했었음
+
+
+### 도커 이미지 빌드
+
+#### jar으로 프로젝트 빌드
+
+```bash
+./gradlew :microservices/product-service/build
+```
+
+#### Dockerfile을 이용해 도커 이미지 빌드
+
+```Dockerfile
+FROM openjdk:12.0.2
+
+EXPOSE 8080
+
+ADD ./build/libs/*.jar app.jar
+
+ENTRYPOINT ["java","-jar","/app.jar"]
+```
+
+```bash
+docker build -t product-service .
+
+# 확인
+docker images | grep product-service
+```
+
+#### -t ( TAG 이름 )
+
+#### 도커 이미지 실행
+
+```bash
+docker run --rm -p 8080:8080 -e "SPRING_PROFILE_ACTIVE=docker" product-service
+```
+
+#### 실행 확인
+
+```bash
+curl localhost:8080/product/3 | jq
+```
+
+#### 데몬모드로 실행하기
+
+```bash
+docker run -d -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=docker" --name my-prd-svc product-service
+```
+
+- 로그 보기
+
+```bash
+docker logs my-prd-srv -f
+```
+
