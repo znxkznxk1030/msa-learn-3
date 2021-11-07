@@ -25,7 +25,7 @@ app:
       host: product
       port: 8080
     recommendation-service:
-      host: recommendtaion
+      host: recommendation
       port: 8080
     review-service:
       host: review

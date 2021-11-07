@@ -412,7 +412,7 @@ chmod u+x ./bash-test.bash
 ### 첫 도커 명령 실행
 
 ```bash
-docker fun -it --rm ubuntu
+docker run -it --rm ubuntu
 ```
 
 #### -it
@@ -575,6 +575,8 @@ docker-compose logs -f
 ```bash
 curl localhost:8080/product-composite/123 -s | jq .
 ```
+
+![docker-compose test](./screen-shot/docker-compose_test.png)
 
 #### 종료
 
