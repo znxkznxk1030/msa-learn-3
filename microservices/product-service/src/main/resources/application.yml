@@ -6,5 +6,6 @@ logging:
     arthur.kim: DEBUG
     
 ---
-spring.profile: docker
+spring.profiles: docker
+
 server.port: 8080

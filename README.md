@@ -495,3 +495,90 @@ docker run -d -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=docker" --name my-prd-svc 
 docker logs my-prd-srv -f
 ```
 
+### docker-compose.yml
+
+#### 마이크로서비스의 이름 => 도커 내부 네크워크에서 사용하는 컨테이너의 호스트 이름
+
+#### build : Dockerfile의 위치를 지정하는 빌드 지시문
+
+#### mem_limit : 메모리는 350MB로 제한, 이래야 총 6GB로 맞출 수 있음
+
+#### environment : 환경변수, 스프링 프로필 지정하기 위함
+
+```yml
+version: '2.1'
+
+services:
+   product:
+      build: microservices/product-service
+      mem_limit: 350m
+      environment:
+         - SPRING_PROFILES_ACTIVE=docker
+         
+   recommendation:
+      build: microservices/recommendation-service
+      mem_limit: 350m
+      environment:
+         - SPRING_PROFILES_ACTIVE=docker
+
+   reivew:
+      build: microservices/reivew-service
+      mem_limit: 350m
+      environment:
+         - SPRING_PROFILES_ACTIVE=docker
+
+   product-composite:
+      build: microservices/product-composite-service
+      mem_limit: 350m
+      ports:
+         - "8080:8080"
+      environment:
+         - SPRING_PROFILES_ACTIVE=docker
+```
+
+### 마이크로서비스 환경 시작
+
+#### 이미지 빌드
+
+```bash
+./gradlew build
+docker-compose build
+```
+
+![docker-compose build](./screen-shot/docker-compose_build.png)
+
+
+#### 이미지 확인
+
+```bash
+docker images
+```
+
+![docker images](screen-shot/docker_images.png)
+
+#### 도커 실행
+
+```bash
+docker-compose up -d
+```
+
+#### 모니터링
+
+```bash
+docker-compose logs -f
+```
+
+![docker-compose logs](./screen-shot/docker-compose_logs.png)
+
+#### 테스트
+
+```bash
+curl localhost:8080/product-composite/123 -s | jq .
+```
+
+#### 종료
+
+```bash
+docker-compose down
+```
+
