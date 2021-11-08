@@ -441,7 +441,6 @@ docker rm -f $(docker ps -aq)
 
 - 9 버전 이하의 자바에서는 리눅스 cgroup으로 지정한 자원 할당량을 무시했었음
 
-
 ### 도커 이미지 빌드
 
 #### jar으로 프로젝트 빌드
@@ -547,7 +546,6 @@ docker-compose build
 
 ![docker-compose build](./screen-shot/docker-compose_build.png)
 
-
 #### 이미지 확인
 
 ```bash
@@ -583,4 +581,3 @@ curl localhost:8080/product-composite/123 -s | jq .
 ```bash
 docker-compose down
 ```
-
