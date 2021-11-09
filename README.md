@@ -581,3 +581,43 @@ curl localhost:8080/product-composite/123 -s | jq .
 ```bash
 docker-compose down
 ```
+
+### bash script를 이용한 MSA 환경테스트
+
+#### testUrl
+
+```bash
+function testUrl() {
+  url=$@
+  if curl $url -ks -f -o /dev/null
+  then
+    echo "Ok"
+    return 0
+  else
+    echo -n "not yet"
+    return 1
+  fi;
+}
+```
+
+#### waitForService
+
+```bash
+function waitForService() {
+  url=$@
+  echo -n "Wait for: $url..."
+  n=0
+  until testUrl $url
+  do
+    n=$((n + 1))
+    if [[ $n == 100 ]]
+    then
+      echo " Give up "
+      exit 1
+    else
+      sleep 6
+      echo -n ", retry #$n "
+    fi
+  done
+}
+```
