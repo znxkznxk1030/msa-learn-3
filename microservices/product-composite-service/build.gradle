@@ -10,6 +10,7 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
+	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
 }
 
 dependencies {
@@ -23,6 +24,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 
+	implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-spring-webflux:3.0.0-SNAPSHOT'
+	
 	implementation project(':api')
 	implementation project(':util')
 }

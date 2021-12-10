@@ -582,7 +582,7 @@ curl localhost:8080/product-composite/123 -s | jq .
 docker-compose down
 ```
 
-### bash script를 이용한 MSA 환경테스트
+### bash script를 이용한 마이크로 서비스 환경테스트
 
 #### testUrl
 
@@ -619,5 +619,41 @@ function waitForService() {
       echo -n ", retry #$n "
     fi
   done
+}
+```
+
+## Chapter 5 | OpenAPI / 스웨거를 사용한 API 문서화
+
+### 목표 : product-composite-service 노출하는 공개 API에 스퀘거 기반 문서추가
+
+### 의존성 추가
+
+- springfox-swagger2 : 스웨거 2 기반의 문서 생성
+- springfox-spring-webflux : 스프링 웹플럭스 기반의 RESTful 오퍼레이션 지원
+- springfox-swagger-ui : 마이크로서비스에 스웨거 뷰어를 내장
+
+```gradle
+<!-- product-composite-service -->
+
+  implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-swagger-ui:3.0.0-SNAPSHOT'
+	implementation 'io.springfox:springfox-spring-webflux:3.0.0-SNAPSHOT'
+
+<!-- maven 추가 -->
+repositories {
+	mavenCentral()
+	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
+}
+```
+
+```gradle
+<!-- api -->
+
+  implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
+
+<!-- maven 추가 -->
+repositories {
+	mavenCentral()
+	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
 }
 ```

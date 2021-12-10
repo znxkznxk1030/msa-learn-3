@@ -1,32 +1,28 @@
 server.port: 7000
-
 logging:
-  level:
-    root: INFO
-    arthur.kim: DEBUG
-
+   level:
+      root: INFO
+      arthur.kim: DEBUG
 app:
-    product-service:
+   product-service:
       host: localhost
       port: 7001
-    recommendation-service:
+   recommendation-service:
       host: localhost
       port: 7002
-    review-service:
+   review-service:
       host: localhost
       port: 7003
-
 ---
 spring.profiles: docker
 server.port: 8080
-
 app:
-    product-service:
+   product-service:
       host: product
       port: 8080
-    recommendation-service:
+   recommendation-service:
       host: recommendation
       port: 8080
-    review-service:
+   review-service:
       host: review
       port: 8080
