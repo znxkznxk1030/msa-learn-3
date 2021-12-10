@@ -635,25 +635,13 @@ function waitForService() {
 ```gradle
 <!-- product-composite-service -->
 
-  implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
-	implementation 'io.springfox:springfox-swagger-ui:3.0.0-SNAPSHOT'
-	implementation 'io.springfox:springfox-spring-webflux:3.0.0-SNAPSHOT'
-
-<!-- maven 추가 -->
-repositories {
-	mavenCentral()
-	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
-}
+implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+implementation group: 'io.springfox', name: 'springfox-spring-webflux', version: '3.0.0'
 ```
 
 ```gradle
 <!-- api -->
 
-  implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
-
-<!-- maven 추가 -->
-repositories {
-	mavenCentral()
-	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
-}
+implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 ```

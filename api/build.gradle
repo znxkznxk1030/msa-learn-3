@@ -23,12 +23,11 @@ sourceCompatibility = '11'
 
 repositories {
 	mavenCentral()
-	maven { url 'http://oss/jfrog.org/artifactory/oss-snapshot-local/' }Ï
 }
 
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-webflux')
-	implementation 'io.springfox:springfox-swagger2:3.0.0-SNAPSHOT'
+	implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 }
 
 test {
