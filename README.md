@@ -634,36 +634,98 @@ function waitForService() {
 
 ```gradle
 <!-- product-composite-service -->
-
-implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
-implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
-implementation group: 'io.springfox', name: 'springfox-spring-webflux', version: '3.0.0'
+implementation "io.springfox:springfox-boot-starter:3.0.0"
 ```
 
 ```gradle
 <!-- api -->
-
-implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+implementation "io.springfox:springfox-boot-starter:3.0.0"
 ```
 
 ### SpringFoxConfig
 
 ```java
-@Configuration
-public class SpringFoxConfig {
+@Value("${api.common.version}")
+ String apiVersion;
+ @Value("${api.common.title}")
+ String apiTitle;
+ @Value("${api.common.description}")
+ String apiDescription;
+ @Value("${api.common.termsOfServiceUrl}")
+ String apiTermsOfServiceUrl;
+ @Value("${api.common.license}")
+ String apiLicense;
+ @Value("${api.common.licenseUrl}")
+ String apiLicenseUrl;
+ @Value("${api.common.contact.name}")
+ String apiContactName;
+ @Value("${api.common.contact.url}")
+ String apiContactUrl;
+ @Value("${api.common.contact.email}")
+ String apiContactEmail;
+
  @Bean
  public Docket apiDocumentation() {
-  return new Docket(DocumentationType.SWAGGER_2)
-   select()
-   apis(RequestHandlerSelectors.any())
-   paths(PathSelectors.any())
-   build();
+  return new Docket(DocumentationType.SWAGGER_2).select()
+    .apis(basePackage("arthur.kim.*")).paths(PathSelectors.any()).build()
+    .apiInfo(new ApiInfo(apiTitle, apiDescription, apiVersion, apiTermsOfServiceUrl,
+      new Contact(apiContactName, apiContactUrl, apiContactEmail), apiLicense, apiLicenseUrl,
+      emptyList()));
  }
-}
 ```
 
 - 스웨거 V2 문서를 생성하고자 Docket 빈을 초기화한다.
 - apis(), paths() 메서드로 스프링 폭스가 API 정보를 찾을 위치를 지정
-  
 
-> http://localhost:8080/swagger-ui/index.html
+```yml
+api:
+
+  common:
+    version: 1.0.0
+    title: Sample API
+    description: Description of the API...
+    termsOfServiceUrl: MINE TERMS OF SERVICE URL
+    license: License
+    licenseUrl: MY LICENSE URL
+
+    contact:
+      name: Contact
+      url: My
+      email: me@mail.com
+
+  product-composite:
+
+    get-composite-product:
+      description: Returns a composite view of the specified product id
+      notes: |
+        # Normal response
+        If the requested product id is found the method will return information regarding:
+        1. Base product information
+        1. Reviews
+        1. Recommendations
+        1. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
+
+        # Expected partial and error responses
+        In the following cases, only a partial response be created (used to simplify testing of error conditions)
+
+        ## Product id 113
+        200 - Ok, but no recommendations will be returned
+
+        ## Product id 213
+        200 - Ok, but no reviews will be returned
+
+        ## Non numerical product id
+        400 - A <b>Bad Request</b> error will be returned
+
+        ## Product id 13
+        404 - A <b>Not Found</b> error will be returned
+
+        ## Negative product ids
+        422 - An <b>Unprocessable Entity</b> error will be returned
+```
+  
+### ui  접속
+
+> <http://localhost:8080/swagger-ui/index.html>
+
+![swagger-ui](./screen-shot/swagger-ui.png)
