@@ -645,3 +645,25 @@ implementation group: 'io.springfox', name: 'springfox-spring-webflux', version:
 
 implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
 ```
+
+### SpringFoxConfig
+
+```java
+@Configuration
+public class SpringFoxConfig {
+ @Bean
+ public Docket apiDocumentation() {
+  return new Docket(DocumentationType.SWAGGER_2)
+   select()
+   apis(RequestHandlerSelectors.any())
+   paths(PathSelectors.any())
+   build();
+ }
+}
+```
+
+- 스웨거 V2 문서를 생성하고자 Docket 빈을 초기화한다.
+- apis(), paths() 메서드로 스프링 폭스가 API 정보를 찾을 위치를 지정
+  
+
+> http://localhost:8080/swagger-ui/index.html
