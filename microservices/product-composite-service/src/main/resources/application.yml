@@ -1,5 +1,4 @@
 api:
-
   common:
     version: 1.0.0
     title: Sample API
@@ -14,7 +13,6 @@ api:
       email: me@mail.com
 
   product-composite:
-
     get-composite-product:
       description: Returns a composite view of the specified product id
       notes: |

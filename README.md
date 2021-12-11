@@ -703,6 +703,29 @@ implementation "io.springfox:springfox-boot-starter:3.0.0"
 public ApiInfo( title, description, version, termsOfServiceUrl, contact, license, licenseUrl, vendorExtensions )
 ```
 
+### 문서 작성
+
+```java
+@Api(description = "REST API for composite product information")
+public interface ProductCompositeService {
+
+ /**
+  * Sample usage: curl $HOST:$PORT/product-composite/1
+  *
+  * @param productId
+  * @return the composite product info, if found, else null
+  */
+ @ApiOperation(value = "${api.product-composite.get-composite-product.description}", notes = "${api.product-composite.get-composite-product.notes}")
+ @ApiResponses(value = {
+   @ApiResponse(code = 400, message = "Bad Request, invalid format of the request. See response message for more information."),
+   @ApiResponse(code = 404, message = "Not found, the specified id does not exist."),
+   @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fails. See response message for more information.") })
+ @GetMapping(value = "/product-composite/{productId}", produces = "application/json")
+ ProductAggregate getProduct(@PathVariable int productId);
+}
+
+```
+
 ### 명세서 ( application.yml )
 
 ```yml
@@ -763,3 +786,58 @@ api:
 
 ![swagger-ui](./screen-shot/swagger-ui.png)
 ![swagger-ui2](./screen-shot/swagger-ui2.png)
+
+### Q&A
+
+#### 1. 스프링 폭스로 RESTful 서비스의 API 문서를 작성할 때의 장점은 무엇인가?
+
+> 스프링 폭스를 사용하면 API를 구현하는 소스 코드와 연동해 API를 문서화할 수 있다.
+> 이런 기능은 자바코드와 API 문서의 수명주기가 다르면 시간이 지나면서 쉽게 어긋나기 때문
+
+#### 2. 스프링 폭스가 지원하는 API 문서화 사양은 무엇인가?
+
+> OpenAPI
+> 2015년에 스마트베어 소프르웨어가 리눅스 재단 산하의 Open API initiative 스웨거 사양을 거부하고 OpenAPI 사양을 만들었다.
+
+#### 3. 스프링 폭스 Docket 빈의 사용 목적은 무엇인가?
+
+> 스프링 폭스 구성에 사용된다. ( 버전관리, path 등등)
+
+#### 4. 스프링 폭스가 API 문서 작성을 위해 런타임에 검사하는 애노테이션에는 어떤것들이 있는가?
+
+- @Api - 패키지의 API 정보 ( deprecated )
+- @ApiOperation - 해당 서비스의 API 정보
+- @ApiResponse - 응답에 대한 설명
+- @GetMapping - 스프링 폭스는 @GetMapping 어노테이션을 검사해 오퍼레이션의 파라미터와 응답 유형을 파악
+
+#### 5. YAML 파일에서 : ㅣ 의 의미는 무엇인가?
+
+- ":" 는 통상 key 가 된다
+
+```yml
+key: value
+
+key: 
+  key1:
+    key2:
+```
+
+- "|" 는 줄바꿈을 포함, ">"는 줄바꿈을 무시
+
+```yml
+line_break: | 
+  hello,
+  world
+
+single_line: >
+  hello,
+  world
+```
+
+#### 6. 내장된 스웨거 뷰어로 수행했던 API 호출을 뷰얼르 사용하지 않고 반복하려면 어떻게 해야 하는가?
+
+> 스웨거 UI를 사용하지 않고 API 호출을 시도하고 싶다면 응답 항목에서 curl 커맨드를 복사해 터미널 창에서 실행
+
+```bash
+curl -X GET "http://localhost:8080/product-composite/123" -H "accept: application/json"
+```
