@@ -407,6 +407,69 @@ chmod u+x ./bash-test.bash
 200
 ```
 
+### Chapter 3 | Q&A
+
+#### 1. 스프링 이니셜라이저로 스프링 부트 프로젝트를 생성할 때 사용 가능한 의존성 목록을 보는 커맨드는 무엇인가?
+
+> spirng init --list
+
+#### 2. 그래들이 여러 개의 관련 프로젝트를 하나의 커맨드로 빌드하도록 설정하려면 어떻게 해야 하는가?
+
+1. 먼저 settings.gradle 파일을 생성하고 그래들이 빌드할 프로젝트를 입력한다.
+
+    ```gradle
+    <!-- settings.gradle -->
+    include ':microservices:product-service'
+    include ':microservices:review-service'
+    include ':microservices:recommendation-service'
+    include ':microservices:product-composite-service'
+    ```
+
+2. product-service 프로젝트에서 그래들 실행 파일을 복사한다. 복사한 파일은 멀티 프로젝트 빌드에서 재사용한다.
+
+    ```bash
+    # 꼭 product일 필요는 없음 그냥 gradle 실행 파일 한개가 필요할 뿐.
+    cp -r microserivce/product-service/gradle .
+    cp microserivce/product-service/gradlew .
+    cp microserivce/product-service/gradlew.bat .
+    cp microserivce/product-service/.gitignore .
+    ```
+
+3. 이제 각 프로젝트에선 그래들 실행 파일이 필요 없으므로 다음 커맨드로 제거한다.
+
+    ```bash
+    find microservices -depth -name "gradle" -exec rm -rfv "{}" \;
+    find microservices -depth -name "gradlew*" -exec rm -fv "{}" \;
+    ```
+
+4. 이제 하나의 커맨드로 전체 마이크로서비스를 빌드할 수 있다.
+
+    ```bash
+    ./gradlew build
+    ```
+
+#### 3. @PathVariable과 @RequestParam 애노테이션의 사용 목적은 무엇인가?
+
+> @PathVariable,@RequestParam 둘 다 HTTP 요청으로 전달된 값을 매개 변수에 매핑
+
+- @PathVariable : Path 형식의 URL에서 파라미터를 받아올때 사용 ex) <http://site.com/123>
+
+    ```java
+    @GetMapping("/{id}")
+    public void getService(@PathVariable("id") int id) {}
+    ```
+
+- @RequestParam : 쿼리형식의 URL에서 파라미터를 받아올 때 사용 ex) <http://site.com?id=123>
+
+    ```java
+    @GetMapping("/")
+    public void getService(@RequestParam(value = "id", required = false) int id) {}
+    ```
+
+#### 4. API 구현 클래스의 비즈니스 로직과 프로토콜별 예외 처리를 분리하려면 어떻게 해야 하는가?
+
+#### 5. 모키토의 사용 목적은 무엇인가?
+
 ## Chapter 4
 
 ### 첫 도커 명령 실행
@@ -911,7 +974,7 @@ single_line: >
   world
 ```
 
-#### 6. 내장된 스웨거 뷰어로 수행했던 API 호출을 뷰얼르 사용하지 않고 반복하려면 어떻게 해야 하는가?
+#### 6. 내장된 스웨거 뷰어로 수행했던 API 호출을 뷰어를 사용하지 않고 반복하려면 어떻게 해야 하는가?
 
 > 스웨거 UI를 사용하지 않고 API 호출을 시도하고 싶다면 응답 항목에서 curl 커맨드를 복사해 터미널 창에서 실행
 
