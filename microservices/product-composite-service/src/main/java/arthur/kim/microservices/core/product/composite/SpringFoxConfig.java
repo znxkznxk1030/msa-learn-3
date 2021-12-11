@@ -46,8 +46,10 @@ public class SpringFoxConfig implements WebMvcConfigurer {
 
 	@Bean
 	public Docket apiDocumentation() {
-		return new Docket(DocumentationType.SWAGGER_2).select()
-				.apis(basePackage("arthur.kim.*")).paths(PathSelectors.any()).build()
+		return new Docket(DocumentationType.SWAGGER_2)
+				.select()
+				.apis(RequestHandlerSelectors.any())
+				.paths(PathSelectors.any()).build()
 				.apiInfo(new ApiInfo(apiTitle, apiDescription, apiVersion, apiTermsOfServiceUrl,
 						new Contact(apiContactName, apiContactUrl, apiContactEmail), apiLicense, apiLicenseUrl,
 						emptyList()));

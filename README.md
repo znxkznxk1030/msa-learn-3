@@ -666,8 +666,10 @@ implementation "io.springfox:springfox-boot-starter:3.0.0"
 
  @Bean
  public Docket apiDocumentation() {
-  return new Docket(DocumentationType.SWAGGER_2).select()
-    .apis(basePackage("arthur.kim.*")).paths(PathSelectors.any()).build()
+  return new Docket(DocumentationType.SWAGGER_2)
+    .select()
+    .apis(RequestHandlerSelectors.any())
+    .paths(PathSelectors.any()).build()
     .apiInfo(new ApiInfo(apiTitle, apiDescription, apiVersion, apiTermsOfServiceUrl,
       new Contact(apiContactName, apiContactUrl, apiContactEmail), apiLicense, apiLicenseUrl,
       emptyList()));
@@ -676,6 +678,32 @@ implementation "io.springfox:springfox-boot-starter:3.0.0"
 
 - 스웨거 V2 문서를 생성하고자 Docket 빈을 초기화한다.
 - apis(), paths() 메서드로 스프링 폭스가 API 정보를 찾을 위치를 지정
+
+### Docket
+
+- API 문서는 버전관리가 되어야 하므로, Docket Bean 단위로 버전관리를 작성
+
+#### select()
+
+- ApiSelectorBuilder를 생성
+
+#### apis()
+
+- api 스펙이 작성되어 있는 패키지 지정
+
+#### paths()
+
+- apis()로 선택되어진 API중에서 특정 path 조건에 맞는 API들을 다시 필터링 하여 문서화
+
+#### apiInfo()
+
+- 제목, 설명 등 문서에 대한 정보들을 보여주기 위해 호출
+
+```java
+public ApiInfo( title, description, version, termsOfServiceUrl, contact, license, licenseUrl, vendorExtensions )
+```
+
+### 명세서 ( application.yml )
 
 ```yml
 api:
@@ -694,16 +722,15 @@ api:
       email: me@mail.com
 
   product-composite:
-
     get-composite-product:
       description: Returns a composite view of the specified product id
       notes: |
         # Normal response
         If the requested product id is found the method will return information regarding:
         1. Base product information
-        1. Reviews
-        1. Recommendations
-        1. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
+        2. Reviews
+        3. Recommendations
+        4. Service Addresses\n(technical information regarding the addresses of the microservices that created the response)
 
         # Expected partial and error responses
         In the following cases, only a partial response be created (used to simplify testing of error conditions)
@@ -724,8 +751,15 @@ api:
         422 - An <b>Unprocessable Entity</b> error will be returned
 ```
   
-### ui  접속
+### swagger-ui  이슈
+
+> 스프링 - 2.3.x, swagger - 3.0.0 버전에서는 페이지가 안뜨는 이슈가 있다.
+
+<https://stackoverflow.com/questions/48311447/springboot-swagger-url-shows-whitelabel-error-page>
+
+### swagger-ui  접속
 
 > <http://localhost:8080/swagger-ui/index.html>
 
 ![swagger-ui](./screen-shot/swagger-ui.png)
+![swagger-ui2](./screen-shot/swagger-ui2.png)

@@ -26,7 +26,7 @@ public class ProductServiceImpl implements ProductService {
   public Product getProduct(int productId) {
 	LOG.debug("/product return the found product for productId={}", productId);
 	
-	if ( productId < 1 ) throw new InvalidInputException("Invalid produceId: " + productId);
+	if ( productId < 1 ) throw new InvalidInputException("Invalid productId: " + productId);
 	if ( productId == 13 ) throw new NotFoundException("No product found for productId: " + productId); 
 	
 	
