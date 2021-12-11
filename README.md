@@ -622,6 +622,18 @@ function waitForService() {
 }
 ```
 
+### Chapter 4 | Q&A
+
+#### 1. 가상머신과 도커 컨테이너의 주요 차이점은 무엇인가?
+
+> 가상머신은 하이퍼바이저를 사용해 운영체제 전체를 실행한다.
+
+> 반면 도커 컨테이너는 리눅스 호스트에서 실행되며, 리눅스 네임스페이스를 이용해서 사용자, 프로세스, 파일시스템, 네트워킹등의 전역 시스켐 리소스를 컨테이너에 분배한다.
+
+![가상머신 vs 컨테이너](./screen-shot/virtualization-vs-containers_transparent.png)
+
+
+
 ## Chapter 5 | OpenAPI / 스웨거를 사용한 API 문서화
 
 ### 목표 : product-composite-service 노출하는 공개 API에 스퀘거 기반 문서추가
@@ -787,7 +799,7 @@ api:
 ![swagger-ui](./screen-shot/swagger-ui.png)
 ![swagger-ui2](./screen-shot/swagger-ui2.png)
 
-### Q&A
+### Chapter 5 | Q&A
 
 #### 1. 스프링 폭스로 RESTful 서비스의 API 문서를 작성할 때의 장점은 무엇인가?
 
