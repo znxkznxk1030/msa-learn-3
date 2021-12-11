@@ -630,9 +630,74 @@ function waitForService() {
 
 > 반면 도커 컨테이너는 리눅스 호스트에서 실행되며, 리눅스 네임스페이스를 이용해서 사용자, 프로세스, 파일시스템, 네트워킹등의 전역 시스켐 리소스를 컨테이너에 분배한다.
 
+> 리눅스 제어 그룹 ( cgroup ) 을 사용해 컨테이너가 사용할 수 있는 CPU와 메모리를 제한한다.
+
 ![가상머신 vs 컨테이너](./screen-shot/virtualization-vs-containers_transparent.png)
 
+#### 2. 도커가 네임스페이스, cgroup을 사용하는 목적은 무엇인가?
 
+> 하이퍼바이저를 사용해 운영체제 전체를 실행하는 가상머신과 비교하면 컨테이너의 오버헤드는 일부분에 불과하다.
+
+#### 3. 컨테이너의 최대 메모리 설정을 무시하고, 허용량을 초과해 메모리를 할당한 자바 애플리케이션은 어떻게 되는가?
+
+> java SE 버전 10이하에서는 도커를 지원하지 않았다.
+> 이전에는 자바가 리눅스 cgroup으로 지정한 자원 할당량을 무시했기 때문에, 자바는 컨테이너에 허용된 메모리를 JVM에 할당하는게 아니라 도커 호스트의 전체 메모리를 할당했다.
+
+```bash
+echo 'new byte[500_000_000]' | docker run -i --rm -m=1024M open-jdk:12.0.2 jshell -q
+# 도커는 메모리의 1/4를 힙에 할당한다. ( => 256M가 힙에 할당되었고, 500M를 요청한 상태이다. )
+```
+
+- java SE 10 이후
+
+> Exception java.lang.OutOfMemoryError:Java heap space
+> JVM이 컨테이너의 최대 메모리 설정을 준수하므로 해당 동작을 수행하지 못함.
+
+- java SE 9 이전
+
+> 자바 관점에서 보면 작동하는게 맞다.
+> 자바는 총 메모리가 16GB라고 생각하고 힙크디는 4GB로 설정되어 있기 때문.
+> 그러나 JVM의 메모리 크기는 1GB를 초과하게 되며, 도커는 즉각 컨테이너를 종료하면서 State engine terminated와 같은 알 수 없는 예외를 출력하게 된다.
+
+#### 4. 스프링 기반 애플리케이션을 소스 코드 수정없이 도커 컨테이너로 실행하려면 어떻게 해야 하는가?
+
+> 마이크로서비스를 컨테이너에서 실행하더라도, 소스 코드를 변경할 필요는 없으며, 마이크로서비스의 구성만 변경하면 된다.
+
+- product | application.yml
+
+```yml
+# 추가
+---
+spring.profiles: docker
+server.port: 8080
+```
+
+- -e: 이 옵션으로 컨테이너의 환경 변수를 지정할 수 있다. 앞의 커맨드에선 SPRING_PROFILES_ACTIVE=docker 환경 변수를 사용해 스프링 프로필을 docker로 지정했다.
+
+```bash
+docker run --rm -p8080:8080 -e "SPRING_PROFILES_ACTIVE=docker" product-service
+```
+
+#### 5. 다음의 도커 컴포즈 코드가 작동하지 않는 이유는 무엇인가?
+
+> 호스트의 포트 8080이 중복되기 때문.
+> 컨테이너의 포트는 독립적이기 때문에 중복가능하지만 호스트는 하나이기 때문에 중복될 수 없다.
+
+```yml
+review:
+  build: microservices/review-service
+  ports:
+    - "8080:8080"
+  environment:
+    - SPRING_PROFILES_ACTIVE=docker
+
+product-composite:
+  build: microservice/product-composite-service
+  ports:
+    - "8080:8080" # 8080 포트가 이미 review-service에 할당되어 있기 때문
+  environment:
+    - SPRING_PROFILES_ACTIVE=docker
+```
 
 ## Chapter 5 | OpenAPI / 스웨거를 사용한 API 문서화
 
