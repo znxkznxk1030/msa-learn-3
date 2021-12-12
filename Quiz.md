@@ -1,6 +1,66 @@
 # Quiz
 
-## Chapter 3 | Q&A
+## Chapter 2 | 스프링 부트 소개
+
+### 1. @SpringBootApplication 애노테이션이 제공하는 기능은 무엇인가?
+
+- 컴포넌트 검색을 활성화해 애플리케이션 클래스의 패키지와 모든 하위 패키지에서 스프링 컴포넌트와 구성 클래스(@Component)를 검색한다.
+- 애플리케이션 클래스 자체를 구성 클래스로 만든다.
+- 자동 설정을 활성화해 스프링 부트가 설정 가능한 JAR 파일을 클래스패스classpath에서 자동으로 찾게 한다. 예를 들어, 톰캣이 클래스패스에 있는 경우 스프링 부트는 톰캣을 내장형 웹 서버로 자동 구성한다.
+
+```java
+@SpringBootApplication
+public class MyApplication {
+
+  public static void main (String[] args) {
+    SpringApplication.run(MyApplication.class, args);
+  }
+}
+```
+
+### 2. REST 서비스 개발을 위한 컴포넌트인 스프링 웹 MVC와 스프링 웹플럭스의 주요 차이점은 무엇인가?
+
+> 논블로킹 HTTP 클라이언트와 서비스의 개발을 지원
+
+- 애노테이션 기반 명령형 방식: 기존 웹 프레임워크인 스프링 웹 MVC와 유사하지만 리액티브 서비스를 지원
+- 함수 지향 모델 기반의 라우터 및 핸들러 방식
+
+### 3. 스프링 폭스를 사용해 REST API를 문서화했을 때의 장점은 무엇인가?
+
+> RESTful 서비스 등을 만들고자 API를 개발하는 경우 사용하기 쉽도록 API를 문서화하는 것이 중요한데 \
+> 스웨거는 RESTful 서비스 문서를 공개하는 기능을 다수의 주요 API 게이트웨이가 내장하고 있다. \
+> 스프링 폭스는 런타임에 스웨거 기반의 API문서를 생성한다.
+
+### 4. 스프링 데이터의 리포지토리가 제공하는 기능은 무엇이며, 가장 단순한 리포지토리 구현은 무엇인가?
+
+> 여러 유형의 데이터베이스에 데이터를 접근하고자 사용한다. \
+> 대개 자바 인터페이스로 선언되며, 스프링 데이터가 상황에 따른 구현을 독자적인 규칙에 맞춰서 생성한다.
+
+- CrudRepository는 생성, 읽기, 업데이트, 삭제 작업을 위한 표준 메서드 제공.
+- CrudRepository를 이용해 가장 간단히 리포지토리를 정의할 수 있다.
+
+```java
+import org.springframework.data.repository.CrudRepository;
+
+public interface ReviewRepository extends CrudRepository<ReviewEntity, ReviewEntityPK> {
+  Collection<ReviewEntity> findByProductId(int productId);
+}
+```
+
+### 5. 스프링 클라우드 스트림의 바인더가 제공하는 기능은 무엇인가?
+
+> 특정 메시징 시스템과 통합 기능을 제공한다. JDBC 드라이버가 특정 데이터베이스를 지원하는 것과 유사
+
+- 메시지: 메시징 시스템과 주고받는 데이터를 설명하는 데이터 구조
+- 게시자: 메시징 시스템에 메시지를 보낸다.
+- 구독자: 메시징 시트템에서 메시지를 받는다.
+- 채널: 메시징 시스템과 통신하는 데 사용한다. 게시자는 출력 채널을 사용하고 구독자는 입력 채널을 사용한다.
+
+### 6. 도커 컴포즈가 제공하는 기능은 무엇인가?
+
+> 단일 커맨드로 여러 컨테이너를 시작 및 중지할 수 있다.
+
+## Chapter 3 | 공조 마이크로서비스 집합 생성
 
 ### 1. 스프링 이니셜라이저로 스프링 부트 프로젝트를 생성할 때 사용 가능한 의존성 목록을 보는 커맨드는 무엇인가?
 
@@ -108,7 +168,7 @@ when(compositeIntegration.getProduct(PRODUCT_ID_OK))
 .thenReturn(new Product(PRODUCT_ID_OK, "name", 1, "mock-address"));
 ```
 
-## Chapter 4 | Q&A
+## Chapter 4 | 도커를 사용항 마이크로서비스 배포
 
 ### 1. 가상머신과 도커 컨테이너의 주요 차이점은 무엇인가?
 
@@ -185,7 +245,7 @@ product-composite:
     - SPRING_PROFILES_ACTIVE=docker
 ```
 
-## Chapter 5 | Q&A
+## Chapter 5 | OpenAPI/스웨거를 사용한 API 문서화
 
 ### 1. 스프링 폭스로 RESTful 서비스의 API 문서를 작성할 때의 장점은 무엇인가?
 
@@ -239,3 +299,5 @@ single_line: >
 ```bash
 curl -X GET "http://localhost:8080/product-composite/123" -H "accept: application/json"
 ```
+
+
