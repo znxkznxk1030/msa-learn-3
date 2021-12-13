@@ -415,7 +415,6 @@ chmod u+x ./bash-test.bash
 200
 ```
 
-
 ## Chapter 4
 
 ### 첫 도커 명령 실행
@@ -800,13 +799,13 @@ api:
 
 ### 의존성 추가 (mapStruct, spring-boot-starter-data-mongodb)
 
-#### mapStruct 
+#### mapStruct
 
 > a code generator that greatly simplifies the implementation of mappings between Java bean types based on a convention over configuration approach.
 
 ```groovy
 ext {
-	mapstructVersion = "1.3.1.Final"
+ mapstructVersion = "1.3.1.Final"
 }
 
 dependencies {
@@ -869,3 +868,29 @@ dependencies {
 ##### @GeneratedValue
 
 > 스프링 데이터 JPA가 id 필드에 고유한 id 값을 자동으로 생성하도록 지시한다.
+
+### Repository
+
+#### CrudRepository
+
+```java
+public interface ReviewRepository extends CrudRepository<ReviewEntity, Integer>{
+ @Transactional(readOnly = true) // 읽기전용이므로 영속성 컨택스트는 스냅샷을 보관하지 않는다. => 메모리 사용량을 최적화 시킬 수 있다.
+ List<ReviewEntity> findByProductId(int productId);
+
+}
+```
+
+#### PagingAndSortingRepository
+
+```java
+public interface ProductRepository extends PagingAndSortingRepository<ProductEntity, String>{
+  Optional<ProductEntity> findByProductId(int productId);
+}
+```
+
+### JPA
+
+#### query-method
+
+<https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/#repositories.query-methods.query-creation>
