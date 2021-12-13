@@ -48,6 +48,14 @@ test {
 }
 ```
 
+### 플러그인
+
+> 미리 구성해 놓은 task들의 그룹이며, 특정 빌드과정에서 필요한 기본정보를 포함하고, 필요에 따라 정보를 수정하여 목적에 맞게 사용할 수 있다.
+
+- org.springframework.boot : 실행 가능한 jar또는 war아카이브를 패키징하고, Spring Boot 애플리케이션을 실행하고, spring-boot-dependencies에서 제공하는 종속성 관리를 사용할 수 있다.
+- io.spring.dependency-management : 스프링버전에 따른 의존성을 자동으로 관리
+- java : 실행가능한 jar를 빌딩하는 테스크가 자동적으로 설정
+
 ###  커맨드로 각 마이크로서비스 빌드
 
 ``` bash
@@ -788,3 +796,38 @@ api:
 ![swagger-ui](./screen-shot/swagger-ui.png)
 ![swagger-ui2](./screen-shot/swagger-ui2.png)
 
+## Chapter 6 | 영속성 추가
+
+### 의존성 추가 (mapStruct, spring-boot-starter-data-mongodb)
+
+#### mapStruct 
+
+> a code generator that greatly simplifies the implementation of mappings between Java bean types based on a convention over configuration approach.
+
+```groovy
+ext {
+	mapstructVersion = "1.3.1.Final"
+}
+
+dependencies {
+  ...
+   // mapstruct
+    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
+}
+```
+
+> 역시 책에 있는대로 따라하면 동작하지 않는다. ( gradle 7버전 이후 compile, compileOnly 옵션 deprecated )
+
+#### spring-boot-starter-data-mongodb
+
+```groovy
+dependencies {
+  ...
+    // mongoDB
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+}
+```
