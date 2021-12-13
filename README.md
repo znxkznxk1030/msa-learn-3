@@ -831,3 +831,41 @@ dependencies {
     testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
 }
 ```
+
+### Entity
+
+#### mongodb
+
+##### @Document(collection="products")
+
+> 이 클래스가 MongoDB 엔티티 클래스이며, products라는 이름의 MongoDB 컬렉션에 매핑된다는 것을 표시한다.
+
+##### @Id 및 @Version
+
+> 스프링 데이터의 id 및 version 필드라는 것을 표시한다.
+
+##### @Indexed(unique = true)
+
+> 비즈니스 키, productId에 생성된 고유색인을 가져온다.
+
+##### @CompoundIndex(name = "prod-rec-id", unique = true, def = "{'productId': 1, 'recommendationId': 1}")
+
+> productId와 recommendationId 필드로 구성된 복합 비즈니스 키를 위한 고유 복합 인덱스를 생성
+
+#### JPA 엔티티 ( javax )
+
+##### @Entity 및 @Table
+
+> 이 클래스가 JPA 엔티티 클래스이며, SQL 데이터베이스의 products 테이블에 매핑된다는 것을 표시한다.
+
+##### @Table(name = "reviews", indexes = { @Index(name = "reviews_unique_idx", unique = true, columnList = "productId,reviewId") })
+
+> productId와 reviewId 필드로 구성된 복합 비즈니스 키를 위한 고유 복합 인덱스를 생성하는 역할도 한다.
+
+##### JPA | @Id 및 @Version
+
+> 스프링 데이터의 id 및 version 필드라는 것을 표시한다.
+
+##### @GeneratedValue
+
+> 스프링 데이터 JPA가 id 필드에 고유한 id 값을 자동으로 생성하도록 지시한다.
