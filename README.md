@@ -992,4 +992,31 @@ public class PersistenceTests {
 
 #### 중복테스트
 
+```java
+// import org.springframework.dao.DuplicateKeyException;
+
+@Test
+  public void duplicateError() {
+    assertThrows(DuplicateKeyException.class, () -> {
+      ProductEntity entity2 = new ProductEntity(savedEntity.getProductId(), "n", 1);
+      repository.save(entity2);
+    });
+  }
+```
+
+##### 중복 에러가 나타나지 않는 현상
+
+<https://stackoverflow.com/questions/66736109/spring-data-for-mongo-db-does-not-throw-duplicatekeyexception>
+
+```yml
+# application.yml
+spring.data.mongodb:
+    host: localhost
+    port: 27017
+    database: product-db
+    auto-index-creation: true
+```
+
 #### optimisticLockError 테스트
+
+

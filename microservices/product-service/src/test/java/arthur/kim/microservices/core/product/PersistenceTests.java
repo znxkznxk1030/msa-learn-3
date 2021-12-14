@@ -2,6 +2,7 @@ package arthur.kim.microservices.core.product;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Optional;
@@ -13,8 +14,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-
-import com.mongodb.DuplicateKeyException;
+import org.springframework.dao.DuplicateKeyException;
 
 import arthur.kim.microservices.core.product.persistence.ProductEntity;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
@@ -75,7 +75,10 @@ public class PersistenceTests {
 	
 	@Test
 	public void duplicateError() {
-		
+		assertThrows(DuplicateKeyException.class, () -> {
+			ProductEntity entity2 = new ProductEntity(savedEntity.getProductId(), "n", 1);
+			repository.save(entity2);
+		});
 	}
 	
 	
