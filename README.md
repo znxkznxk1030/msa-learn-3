@@ -894,3 +894,16 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductEnt
 #### query-method
 
 <https://docs.spring.io/spring-data/data-commons/docs/current/reference/html/#repositories.query-methods.query-creation>
+
+### 영속성 테스트
+
+#### @DataMongoTest
+
+> 테스트를 시작할 때 내장형 MongoDB 데이터베이스를 시작한다.
+
+#### @DataJpaTest
+
+> 테스트를 시작할 때 내장형 SQL 데이터베이스를 시작한다.\
+> 스프링 부트는 다른 테스트에 의한 부작용을 최소화하고자 SQL 데이터베이스에 업데이트한 내용을 롤백하도록 테스트를 구성한다.\
+> 이런 이유로 일부 테스트가 실패하기 때문에 클래스 수준 어노테이션 @Transactional(propagation = NOT_SUPPORT)을 사용해 자동 롤백을 비활성화 한다.
+
