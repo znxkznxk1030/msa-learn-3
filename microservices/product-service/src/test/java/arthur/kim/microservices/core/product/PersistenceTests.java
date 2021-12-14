@@ -1,21 +1,26 @@
 package arthur.kim.microservices.core.product;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import com.mongodb.DuplicateKeyException;
 
 import arthur.kim.microservices.core.product.persistence.ProductEntity;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
 
-@RunWith(SpringRunner.class)
 @DataMongoTest
+//@TestInstance(Lifecycle.PER_CLASS)
 public class PersistenceTests {
 	
 	@Autowired
@@ -23,7 +28,7 @@ public class PersistenceTests {
 	
 	private ProductEntity savedEntity;
 	
-	@Before
+	@BeforeEach
 	public void setupDb() {
 		repository.deleteAll();
 		
@@ -46,20 +51,29 @@ public class PersistenceTests {
 	
 	@Test
 	public void update() {
+		savedEntity.setName("n2");
+		repository.save(savedEntity);
 		
+		ProductEntity foundEntity = repository.findById(savedEntity.getId()).get();
+		
+		assertEquals(1, (long)foundEntity.getVersion());
+		assertEquals("n2", foundEntity.getName());
 	}
 	
 	@Test
 	public void delete() {
-		
+		repository.delete(savedEntity);
+		assertFalse(repository.existsById(savedEntity.getId()));
 	}
 	
 	@Test
 	public void getByProductId() {
-		
+		Optional<ProductEntity> entity = repository.findByProductId(savedEntity.getProductId());
+		assertTrue(entity.isPresent());
+		assertEqualsProduct(savedEntity, entity.get());
 	}
 	
-	@Test(expected = DuplicateKeyException.class)
+	@Test
 	public void duplicateError() {
 		
 	}

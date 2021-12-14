@@ -907,3 +907,89 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductEnt
 > 스프링 부트는 다른 테스트에 의한 부작용을 최소화하고자 SQL 데이터베이스에 업데이트한 내용을 롤백하도록 테스트를 구성한다.\
 > 이런 이유로 일부 테스트가 실패하기 때문에 클래스 수준 어노테이션 @Transactional(propagation = NOT_SUPPORT)을 사용해 자동 롤백을 비활성화 한다.
 
+#### 테스트 실행
+
+```bash
+./gradlew microservices:product-service:test --tests PersistenceTests
+```
+
+![영속성 테스트](./screen-shot/persistence-test.png)
+
+#### 테스트 설정 ( junit5 | jupiter )
+
+```java
+@DataMongoTest
+//@TestInstance(Lifecycle.PER_CLASS)  // BeforeAll 을 static이 아닌 함수로 사용시
+public class PersistenceTests {
+ 
+ @Autowired
+ private ProductRepository repository;
+ 
+ private ProductEntity savedEntity;
+
+  @BeforeEach
+ public void setupDb() {
+  repository.deleteAll();
+  
+  ProductEntity entity = new ProductEntity(1, "n", 1);
+  savedEntity = repository.save(entity);
+  
+  assertEqualsProduct(entity, savedEntity);
+ }
+}
+```
+
+#### create 테스트
+
+```java
+@Test
+ public void create() {
+  ProductEntity newEntity = new ProductEntity(2, "n", 2);
+  savedEntity = repository.save(newEntity);
+  
+  ProductEntity foundEntity = repository.findById(newEntity.getId()).get();
+  assertEqualsProduct(newEntity, foundEntity);
+  
+  assertEquals(2, repository.count());
+ }
+```
+
+#### update 테스트
+
+```java
+@Test
+ public void update() {
+  savedEntity.setName("n2");
+  repository.save(savedEntity);
+  
+  ProductEntity foundEntity = repository.findById(savedEntity.getId()).get();
+  
+  assertEquals(1, (long)foundEntity.getVersion());
+  assertEquals("n2", foundEntity.getName());
+ }
+```
+
+#### delete 테스트
+
+```java
+@Test
+ public void delete() {
+  repository.delete(savedEntity);
+  assertFalse(repository.existsById(savedEntity.getId()));
+ }
+```
+
+#### getByProductId 테스트
+
+```java
+@Test
+ public void getByProductId() {
+  Optional<ProductEntity> entity = repository.findByProductId(savedEntity.getProductId());
+  assertTrue(entity.isPresent());
+  assertEqualsProduct(savedEntity, entity.get());
+ }
+```
+
+#### 중복테스트
+
+#### optimisticLockError 테스트
