@@ -1,16 +1,16 @@
 package arthur.kim.api.product;
 
 public class Product {
-    private final int productId;
-    private final String name;
-    private final int weight;
-    private final String serviceAddress;
-    
+    private int productId;
+    private String name;
+    private int weight;
+    private String serviceAddress;
+
     public Product() {
-    	this.productId = -1;
-    	this.name = null;
-    	this.serviceAddress = null;
-		this.weight = 0;
+        productId = 0;
+        name = null;
+        weight = 0;
+        serviceAddress = null;
     }
 
     public Product(int productId, String name, int weight, String serviceAddress) {
@@ -34,5 +34,21 @@ public class Product {
 
     public String getServiceAddress() {
         return serviceAddress;
+    }
+
+    public void setProductId(int productId) {
+        this.productId = productId;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    public void setServiceAddress(String serviceAddress) {
+        this.serviceAddress = serviceAddress;
     }
 }

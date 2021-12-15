@@ -1070,3 +1070,71 @@ spring.data.mongodb:
 ```
 
 ![영속성 테스트 2](./screen-shot/persistence-test-2.png)
+
+### API
+
+#### create
+
+```java
+@PostMapping(
+  value = "/product",
+  consumes = "application/json",
+  produces = "application/json"
+)
+Product createProduct(@RequestBody Product body);
+```
+
+#### delete
+
+```java
+@DeleteMapping(
+  value = "/product/{productId}"
+)
+void deleteProduct(@PathVariable int productId);
+```
+
+### Mapper (Entity <-> Api)
+
+```java
+@Mapper(componentModel = "spring")
+public interface RecommendationMapper {
+ 
+ @Mappings({
+  @Mapping(target = "rate", source="entity.rating"),
+  @Mapping(target = "serviceAddress", ignore = true)
+ })
+ Recommendation entityToApi(RecommendationEntity entity);
+
+ @Mappings({
+  @Mapping(target = "rating", source="api.rate"),
+  @Mapping(target = "id", ignore = true),
+  @Mapping(target = "version", ignore = true)
+ })
+ RecommendationEntity apiToEntity(Recommendation api);
+ 
+ List<Recommendation> entityListToApiList(List<RecommendationEntity> entity);
+ List<RecommendationEntity> apiListToEntityList(List<Recommendation> api);
+}
+```
+
+#### entityToApi
+
+> 엔티티 객체를 API 모델 객체에 매핑\
+> 엔티티 클래스에는 serviceAddress가 없으므로 무시가능하도록 ignore = true\
+> 엔티티의 rating 필드와 API 모델의 rate 필드 매핑
+
+#### apiToEntity
+
+> API 모델 객체를 엔티티 객체에 매칭 \
+> API 모델 클래스에는 id, version이 없으므로 ignore = true \
+> 엔티티의 rating 필드와 API 모델의 rate 필드 매핑
+
+- mapstruct 1.3.1.Final 버전에서 알수없는 버그에 헤매다 1.4.0.Beta3 로 바꾸니 해결되었다.
+
+```bash
+> Task :microservices:review-service:compileJava FAILED
+/Users/yskim/Desktop/msa-learn/microservices/review-service/src/main/java/arthur/kim/microservices/core/review/services/ReviewMapper.java:24: error: arthur.kim.microservices.core.review.persistence.ReviewEntity does not have an accessible parameterless constructor.
+        ReviewEntity apiToEntity(Review api);
+                     ^
+1 error
+```

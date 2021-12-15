@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import arthur.kim.api.product.Product;
 import arthur.kim.api.product.ProductService;
+import arthur.kim.microservices.core.product.persistence.ProductRepository;
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
 import arthur.kim.util.http.ServiceUtil;
@@ -16,10 +17,14 @@ public class ProductServiceImpl implements ProductService {
 	
   private static final Logger LOG = LoggerFactory.getLogger(ProductServiceImpl.class);
   private final ServiceUtil serviceUtil;
+  private final ProductRepository repository;
+  private final ProductMapper mapper;
 
   @Autowired
-  public ProductServiceImpl(ServiceUtil serviceUtil) {
+  public ProductServiceImpl(ServiceUtil serviceUtil, ProductMapper mapper, ProductRepository repository) {
     this.serviceUtil = serviceUtil;
+    this.repository = repository;
+    this.mapper = mapper;
   }
 
   @Override
@@ -31,6 +36,18 @@ public class ProductServiceImpl implements ProductService {
 	
 	
     return new Product(productId, "name-" + productId, 123, serviceUtil.getServiceAddress());
+  }
+
+  @Override
+  public Product createProduct(Product body) {
+	  // TODO Auto-generated method stub
+	  return null;
+  }
+
+  @Override
+  public void deleteProduct(int productId) {
+	  // TODO Auto-generated method stub
+	
   }
 
 }

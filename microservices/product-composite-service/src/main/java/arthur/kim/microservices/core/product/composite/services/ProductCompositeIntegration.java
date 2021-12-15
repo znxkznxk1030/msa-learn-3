@@ -131,4 +131,40 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
             return new ArrayList<>();
         }
     }
+
+	@Override
+	public Review createReview(Review body) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteReview(int productId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Recommendation createRecommendation(Recommendation body) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteRecommendation(int productId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Product createProduct(Product body) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteProduct(int productId) {
+		// TODO Auto-generated method stub
+		
+	}
 }
