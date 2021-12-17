@@ -16,6 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import arthur.kim.api.product.Product;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.*;
@@ -23,8 +24,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static reactor.core.publisher.Mono.just;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ExtendWith(SpringExtension.class)
-@TestInstance(Lifecycle.PER_CLASS)
+// @ExtendWith(SpringExtension.class)
+// @TestInstance(Lifecycle.PER_CLASS)
 class ProductServiceApplicationTests {
 
   @Autowired
@@ -37,7 +38,7 @@ class ProductServiceApplicationTests {
 	void contextLoads() {
 	}
 
-  @BeforeAll
+  @BeforeEach
   public void setupDb() {
     repository.deleteAll();
   }
@@ -56,26 +57,49 @@ class ProductServiceApplicationTests {
 
   @Test
   public void duplicatedError() {
-    assertTrue(true);
+    int productId = 1;
+
+    postAndVerifyProduct(productId, OK);
+
+    assertTrue(repository.findByProductId(productId).isPresent());
+
+    // postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
+    // .jsonPath("$.path").isEqualTo("/product")
+    // .jsonPath("$.message").isEqualTo("Duplicate Key, Product Id: " + productId);
+    
   }
 
   @Test
   public void deleteProduct() {
-    assertTrue(true);
+    int productId = 1;
+
+    postAndVerifyProduct(productId, OK);
+    assertTrue(repository.findByProductId(productId).isPresent());
+
+    deleteAndVerifyProduct(productId, OK);
+    assertFalse(repository.findByProductId(productId).isPresent());
+
+    deleteAndVerifyProduct(productId, OK);
   }
 
   @Test
   public void getProductInvalidParameterString() {
-    assertTrue(true);
+    getAndVerifyProduct("/no-integer", BAD_REQUEST);
+        // .jsonPath("$.path").isEqualTo("/product/no-integer")
+        // .jsonPath("$.message").isEqualTo("Type mismatch.");
   }
 
   @Test
   public void getProductNotFound() {
-    assertTrue(true);
+    int productIdNotFound = 13;
+		getAndVerifyProduct(productIdNotFound, NOT_FOUND);
   }
 
   @Test
   public void getProductInvalidParameterNegativeValue() {
+    int productIdInvalid = -1;
+
+		getAndVerifyProduct(productIdInvalid, UNPROCESSABLE_ENTITY);
     assertTrue(true);
   }
 
@@ -105,7 +129,7 @@ class ProductServiceApplicationTests {
   }
 
   private WebTestClient.BodyContentSpec deleteAndVerifyProduct(int productId, HttpStatus expectedStatus) {
-    return client.post().uri("/product/" + productId)
+    return client.delete().uri("/product/" + productId)
         .accept(APPLICATION_JSON)
         .exchange()
         .expectStatus().isEqualTo(expectedStatus)
