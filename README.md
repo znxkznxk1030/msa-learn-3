@@ -1144,3 +1144,6 @@ public interface RecommendationMapper {
 > cmd + shift + P \
 > Java: Clean Java Language Server Workspace
 
+##### No qualifying bean of type 'org.springframework.boot.web.reactive.context.ReactiveWebApplicationContext' available
+
+> @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
