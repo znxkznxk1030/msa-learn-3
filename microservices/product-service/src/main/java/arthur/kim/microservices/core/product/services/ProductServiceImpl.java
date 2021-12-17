@@ -1,5 +1,7 @@
 package arthur.kim.microservices.core.product.services;
 
+import java.util.NoSuchElementException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +38,8 @@ public class ProductServiceImpl implements ProductService {
 	
 	if ( productId < 1 ) throw new InvalidInputException("Invalid productId: " + productId);
 	
-	ProductEntity entity = repository.findById(productId).orElseThrow(() -> new NotFoundException("No Product found for productId: " + productId));
-	
+	ProductEntity entity = repository.findByProductId(productId).orElseThrow(() -> new NotFoundException("No Product found for productId: " + productId));
+		
 	Product response = mapper.entityToApi(entity);
 	response.setServiceAddress(serviceUtil.getServiceAddress());
 	return response;

@@ -30,6 +30,6 @@ public interface RecommendationService {
 	@DeleteMapping(
 			value	 = "/recommendation"
 	)
-	void deleteRecommendation(@RequestParam(value = "productId", required = true) int productId);
+	void deleteRecommendations(@RequestParam(value = "productId", required = true) int productId);
 	
 }

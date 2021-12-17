@@ -1138,3 +1138,9 @@ public interface RecommendationMapper {
                      ^
 1 error
 ```
+
+##### Vscode | The import of ** cannot be resolved 에러
+
+> cmd + shift + P \
+> Java: Clean Java Language Server Workspace
+

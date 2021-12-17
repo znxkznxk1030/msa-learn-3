@@ -1,6 +1,5 @@
 package arthur.kim.microservices.core.product.composite.services;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,142 +28,145 @@ import static org.springframework.http.HttpMethod.GET;
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
-    private final RestTemplate restTemplate;
-    private final ObjectMapper mapper;
+  private final RestTemplate restTemplate;
+  private final ObjectMapper mapper;
 
-    private final String productServiceUrl;
-    private final String recommendationServiceUrl;
-    private final String reviewServiceUrl;
+  private final String productServiceUrl;
+  private final String recommendationServiceUrl;
+  private final String reviewServiceUrl;
 
-    @Autowired
-    public ProductCompositeIntegration(
-            RestTemplate restTemplate,
-            ObjectMapper mapper,
+  @Autowired
+  public ProductCompositeIntegration(
+      RestTemplate restTemplate,
+      ObjectMapper mapper,
 
-            @Value("${app.product-service.host}") String productServiceHost,
-            @Value("${app.product-service.port}") int    productServicePort,
+      @Value("${app.product-service.host}") String productServiceHost,
+      @Value("${app.product-service.port}") int productServicePort,
 
-            @Value("${app.recommendation-service.host}") String recommendationServiceHost,
-            @Value("${app.recommendation-service.port}") int    recommendationServicePort,
+      @Value("${app.recommendation-service.host}") String recommendationServiceHost,
+      @Value("${app.recommendation-service.port}") int recommendationServicePort,
 
-            @Value("${app.review-service.host}") String reviewServiceHost,
-            @Value("${app.review-service.port}") int    reviewServicePort
-    ) {
+      @Value("${app.review-service.host}") String reviewServiceHost,
+      @Value("${app.review-service.port}") int reviewServicePort) {
 
-        this.restTemplate = restTemplate;
-        this.mapper = mapper;
+    this.restTemplate = restTemplate;
+    this.mapper = mapper;
 
-        productServiceUrl        = "http://" + productServiceHost + ":" + productServicePort + "/product/";
-        recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort + "/recommendation?productId=";
-        reviewServiceUrl         = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
+    productServiceUrl = "http://" + productServiceHost + ":" + productServicePort + "/product/";
+    recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort
+        + "/recommendation?productId=";
+    reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
+  }
+
+  public Product getProduct(int productId) {
+
+    try {
+      String url = productServiceUrl + productId;
+      LOG.debug("Will call getProduct API on URL: {}", url);
+
+      Product product = restTemplate.getForObject(url, Product.class);
+      LOG.debug("Found a product with id: {}", product.getProductId());
+
+      return product;
+
+    } catch (HttpClientErrorException ex) {
+
+      switch (ex.getStatusCode()) {
+
+        case NOT_FOUND:
+          throw new NotFoundException(getErrorMessage(ex));
+
+        case UNPROCESSABLE_ENTITY:
+          throw new InvalidInputException(getErrorMessage(ex));
+
+        default:
+          LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+          LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+          throw ex;
+      }
     }
+  }
 
-    public Product getProduct(int productId) {
-
-        try {
-            String url = productServiceUrl + productId;
-            LOG.debug("Will call getProduct API on URL: {}", url);
-
-            Product product = restTemplate.getForObject(url, Product.class);
-            LOG.debug("Found a product with id: {}", product.getProductId());
-
-            return product;
-
-        } catch (HttpClientErrorException ex) {
-
-            switch (ex.getStatusCode()) {
-
-                case NOT_FOUND:
-                    throw new NotFoundException(getErrorMessage(ex));
-
-                case UNPROCESSABLE_ENTITY :
-                    throw new InvalidInputException(getErrorMessage(ex));
-
-                default:
-                    LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
-                    LOG.warn("Error body: {}", ex.getResponseBodyAsString());
-                    throw ex;
-            }
-        }
+  private String getErrorMessage(HttpClientErrorException ex) {
+    try {
+      return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+    } catch (IOException ioex) {
+      return ex.getMessage();
     }
+  }
 
-    private String getErrorMessage(HttpClientErrorException ex) {
-        try {
-            return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
-        } catch (IOException ioex) {
-            return ex.getMessage();
-        }
+  public List<Recommendation> getRecommendations(int productId) {
+
+    try {
+      String url = recommendationServiceUrl + productId;
+
+      LOG.debug("Will call getRecommendations API on URL: {}", url);
+      List<Recommendation> recommendations = restTemplate
+          .exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {
+          }).getBody();
+
+      LOG.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
+      return recommendations;
+
+    } catch (Exception ex) {
+      LOG.warn("Got an exception while requesting recommendations, return zero recommendations: {}", ex.getMessage());
+      return new ArrayList<>();
     }
+  }
 
-    public List<Recommendation> getRecommendations(int productId) {
+  public List<Review> getReviews(int productId) {
 
-        try {
-            String url = recommendationServiceUrl + productId;
+    try {
+      String url = reviewServiceUrl + productId;
 
-            LOG.debug("Will call getRecommendations API on URL: {}", url);
-            List<Recommendation> recommendations = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {}).getBody();
+      LOG.debug("Will call getReviews API on URL: {}", url);
+      List<Review> reviews = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<Review>>() {
+      }).getBody();
 
-            LOG.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
-            return recommendations;
+      LOG.debug("Found {} reviews for a product with id: {}", reviews.size(), productId);
+      return reviews;
 
-        } catch (Exception ex) {
-            LOG.warn("Got an exception while requesting recommendations, return zero recommendations: {}", ex.getMessage());
-            return new ArrayList<>();
-        }
+    } catch (Exception ex) {
+      LOG.warn("Got an exception while requesting reviews, return zero reviews: {}", ex.getMessage());
+      return new ArrayList<>();
     }
+  }
 
-    public List<Review> getReviews(int productId) {
+  @Override
+  public Review createReview(Review body) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-        try {
-            String url = reviewServiceUrl + productId;
+  @Override
+  public void deleteReviews(int productId) {
+    // TODO Auto-generated method stub
 
-            LOG.debug("Will call getReviews API on URL: {}", url);
-            List<Review> reviews = restTemplate.exchange(url, GET, null, new ParameterizedTypeReference<List<Review>>() {}).getBody();
+  }
 
-            LOG.debug("Found {} reviews for a product with id: {}", reviews.size(), productId);
-            return reviews;
+  @Override
+  public Recommendation createRecommendation(Recommendation body) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-        } catch (Exception ex) {
-            LOG.warn("Got an exception while requesting reviews, return zero reviews: {}", ex.getMessage());
-            return new ArrayList<>();
-        }
-    }
+  @Override
+  public void deleteRecommendations(int productId) {
+    // TODO Auto-generated method stub
 
-	@Override
-	public Review createReview(Review body) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  }
 
-	@Override
-	public void deleteReview(int productId) {
-		// TODO Auto-generated method stub
-		
-	}
+  @Override
+  public Product createProduct(Product body) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public Recommendation createRecommendation(Recommendation body) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public void deleteProduct(int productId) {
+    // TODO Auto-generated method stub
 
-	@Override
-	public void deleteRecommendation(int productId) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public Product createProduct(Product body) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void deleteProduct(int productId) {
-		// TODO Auto-generated method stub
-		
-	}
+  }
 }
