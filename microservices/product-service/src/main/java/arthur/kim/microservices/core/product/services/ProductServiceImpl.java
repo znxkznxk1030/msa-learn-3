@@ -5,8 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mongodb.DuplicateKeyException;
+
 import arthur.kim.api.product.Product;
 import arthur.kim.api.product.ProductService;
+import arthur.kim.microservices.core.product.persistence.ProductEntity;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
@@ -32,21 +35,29 @@ public class ProductServiceImpl implements ProductService {
 	LOG.debug("/product return the found product for productId={}", productId);
 	
 	if ( productId < 1 ) throw new InvalidInputException("Invalid productId: " + productId);
-	if ( productId == 13 ) throw new NotFoundException("No product found for productId: " + productId); 
 	
+	ProductEntity entity = repository.findById(productId).orElseThrow(() -> new NotFoundException("No Product found for productId: " + productId));
 	
-    return new Product(productId, "name-" + productId, 123, serviceUtil.getServiceAddress());
+	Product response = mapper.entityToApi(entity);
+	response.setServiceAddress(serviceUtil.getServiceAddress());
+	return response;
   }
 
   @Override
   public Product createProduct(Product body) {
-	  // TODO Auto-generated method stub
-	  return null;
+	  try {
+		  ProductEntity entity = mapper.apiToEntity(body);
+		  ProductEntity newEntity = repository.save(entity);
+		  return mapper.entityToApi(newEntity);
+	  } catch (DuplicateKeyException dke) {
+		  throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
+	  }
   }
 
   @Override
   public void deleteProduct(int productId) {
 	  // TODO Auto-generated method stub
+	  repository.findByProductId(productId).ifPresent(e -> repository.delete(e));
 	
   }
 
