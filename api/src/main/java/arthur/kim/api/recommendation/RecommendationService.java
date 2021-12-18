@@ -22,7 +22,7 @@ public interface RecommendationService {
 	
 	@PostMapping(
 			value	 = "/recommendation",
-			consumes = "applicatioin/json",
+			consumes = "application/json",
 			produces = "application/json"
 	)
 	Recommendation createRecommendation(@RequestBody Recommendation body);

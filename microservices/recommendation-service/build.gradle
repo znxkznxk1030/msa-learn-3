@@ -25,13 +25,17 @@ dependencies {
 	implementation project(':util')
 	
 	// mapstruct
-implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     
-    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
-    // mongoDB
-    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+  testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
+  // mongoDB
+  implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+  testImplementation 'de.flapdoodle.embed:de.flapdoodle.embed.mongo'
+
+  // test
+  testImplementation('org.springframework.boot:spring-boot-starter-test')
+  testImplementation('io.projectreactor:reactor-test')
 }
 
 test {

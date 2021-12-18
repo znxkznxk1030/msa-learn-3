@@ -23,15 +23,19 @@ dependencies {
 	implementation project(':api')
 	implementation project(':util')
 	
-    // mapstruct
-implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+  // mapstruct
+  implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+  annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     
-    testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
-    // JPA & MySql
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'mysql:mysql-connector-java'
-    testImplementation 'com.h2database:h2'
+  testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
+  // JPA & MySql
+  implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+  implementation 'mysql:mysql-connector-java'
+  testImplementation 'com.h2database:h2'
+  
+  // test
+  testImplementation('org.springframework.boot:spring-boot-starter-test')
+  testImplementation('io.projectreactor:reactor-test')
 }
 
 test {
