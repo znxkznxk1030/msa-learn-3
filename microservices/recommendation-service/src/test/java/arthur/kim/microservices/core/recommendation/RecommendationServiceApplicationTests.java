@@ -67,28 +67,36 @@ class RecommendationServiceApplicationTests {
     postAndVerifyRecommendation(productId, recommendationId, UNPROCESSABLE_ENTITY);
 
     assertEquals(1, repository.count());
-
-
   }
 
   @Test
   public void deleteRecommendations() {
+    int productId = 1;
+    int recommendationId = 1;
 
+    postAndVerifyRecommendation(productId, recommendationId, OK);
+    assertEquals(1, repository.findByProductId(productId).size());
+
+    deleteAndVerifyRecommendationsByProductId(productId, OK);
+    assertEquals(0, repository.findByProductId(productId).size());
+
+    deleteAndVerifyRecommendationsByProductId(productId, OK);
   }
 
   @Test
   public void getRecommendationsInvalidParameter() {
-
+    getAndVerifyRecommendationsByProductId("?productId=no-integer", BAD_REQUEST);
   }
 
   @Test
   public void getRecommendationsNotFound() {
-
+    getAndVerifyRecommendationsByProductId("?productId=113", OK);
   }
 
   @Test
   public void getRecommendationsInvalidParameterNegativeValue() {
-
+    int productIdInvalid = -1;
+    getAndVerifyRecommendationsByProductId("?productId=" + productIdInvalid, UNPROCESSABLE_ENTITY);
   }
 
   private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {

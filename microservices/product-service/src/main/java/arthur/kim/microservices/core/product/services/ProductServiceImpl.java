@@ -5,9 +5,10 @@ import java.util.NoSuchElementException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.MongoWriteException;
 
 import arthur.kim.api.product.Product;
 import arthur.kim.api.product.ProductService;
@@ -53,12 +54,24 @@ public class ProductServiceImpl implements ProductService {
 		  return mapper.entityToApi(newEntity);
 	  } catch (DuplicateKeyException dke) {
 		  throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
-	  }
+	  } catch (MongoWriteException mwe) {
+      LOG.debug("MongoWriteException error code : {}", mwe.getCode());
+      LOG.debug("MongoWriteException error label : {}", mwe.getErrorLabels());
+      if (mwe.getCode() == 11000) {
+        throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
+      }
+      throw mwe;
+    } catch (Exception e) {
+      LOG.debug("error message : {}", e.getMessage());
+      LOG.debug("error class : {}", e.getClass());
+      LOG.debug("error localized Message : {}", e.getLocalizedMessage());
+      // throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
+      throw e;
+    }
   }
 
   @Override
   public void deleteProduct(int productId) {
-	  // TODO Auto-generated method stub
 	  repository.findByProductId(productId).ifPresent(e -> repository.delete(e));
 	
   }

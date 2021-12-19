@@ -1147,3 +1147,24 @@ public interface RecommendationMapper {
 ##### No qualifying bean of type 'org.springframework.boot.web.reactive.context.ReactiveWebApplicationContext' available
 
 > @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
+#### Spring Mongodb 에서 CompoundIndex의 unique 옵션이 먹히지 않을 때
+
+```yml
+# application.yml
+
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+```
+
+#### DuplicationException 이 안잡힐 때
+
+> import com.mongodb.DuplicateKeyException;
+
+대신에
+
+> import org.springframework.dao.DuplicateKeyException;
+
+를 사용한다.

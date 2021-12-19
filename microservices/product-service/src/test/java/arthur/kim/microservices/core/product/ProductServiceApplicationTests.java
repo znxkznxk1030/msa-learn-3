@@ -63,7 +63,7 @@ class ProductServiceApplicationTests {
 
     assertTrue(repository.findByProductId(productId).isPresent());
 
-    // postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY)
+    postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY);
     // .jsonPath("$.path").isEqualTo("/product")
     // .jsonPath("$.message").isEqualTo("Duplicate Key, Product Id: " + productId);
     

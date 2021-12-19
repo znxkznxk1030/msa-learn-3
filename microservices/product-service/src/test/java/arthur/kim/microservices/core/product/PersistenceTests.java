@@ -94,10 +94,10 @@ public class PersistenceTests {
 	
 	@Test
 	public void duplicateError() {
-//		assertThrows(DuplicateKeyException.class, () -> {
-//			ProductEntity entity2 = new ProductEntity(savedEntity.getProductId(), "n", 1);
-//			repository.save(entity2);
-//		});
+		assertThrows(DuplicateKeyException.class, () -> {
+			ProductEntity entity2 = new ProductEntity(savedEntity.getProductId(), "n", 1);
+			repository.save(entity2);
+		});
 	}
 	
 	@Test

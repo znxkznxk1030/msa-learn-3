@@ -4,8 +4,16 @@ logging:
   level:
     root: INFO
     arthur.kim: DEBUG
-    
----
-spring.profiles: docker
 
+spring:
+  data:
+    mongodb:
+      auto-index-creation: true
+---
+# spring.profiles: docker
+spring:
+  profiles: docker
+  data:
+    mongodb:
+      auto-index-creation: true
 server.port: 8080
