@@ -1048,7 +1048,7 @@ spring.data.mongodb:
  }
 ```
 
-#### paging 테스스
+#### paging 테스트
 
 ```java
 @Test
