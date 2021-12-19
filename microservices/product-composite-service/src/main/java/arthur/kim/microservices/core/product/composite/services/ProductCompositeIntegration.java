@@ -89,14 +89,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
-  private String getErrorMessage(HttpClientErrorException ex) {
-    try {
-      return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
-    } catch (IOException ioex) {
-      return ex.getMessage();
-    }
-  }
-
   public List<Recommendation> getRecommendations(int productId) {
 
     try {
@@ -136,8 +128,11 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Override
   public Product createProduct(Product body) {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
   }
 
   @Override
@@ -168,5 +163,29 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   public void deleteReviews(int productId) {
     // TODO Auto-generated method stub
 
+  }
+
+  private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
+    switch (ex.getStatusCode()) {
+
+      case NOT_FOUND:
+        return new NotFoundException(getErrorMessage(ex));
+      
+      case UNPROCESSABLE_ENTITY:
+        return new InvalidInputException(getErrorMessage(ex));
+      
+      default:
+        LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+        LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+        return ex;
+    }
+  }
+
+  private String getErrorMessage(HttpClientErrorException ex) {
+    try {
+      return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+    } catch (IOException ioex) {
+      return ex.getMessage();
+    }
   }
 }
