@@ -135,13 +135,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   }
 
   @Override
-  public Review createReview(Review body) {
+  public Product createProduct(Product body) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void deleteReviews(int productId) {
+  public void deleteProduct(int productId) {
     // TODO Auto-generated method stub
 
   }
@@ -159,13 +159,13 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   }
 
   @Override
-  public Product createProduct(Product body) {
+  public Review createReview(Review body) {
     // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public void deleteProduct(int productId) {
+  public void deleteReviews(int productId) {
     // TODO Auto-generated method stub
 
   }
