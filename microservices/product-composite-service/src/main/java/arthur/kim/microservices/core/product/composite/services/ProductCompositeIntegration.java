@@ -60,6 +60,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
   }
 
+  @Override
   public Product getProduct(int productId) {
 
     try {
@@ -89,6 +90,25 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
+  @Override
+  public Product createProduct(Product body) {
+    try {
+      return restTemplate.postForObject(productServiceUrl, body, Product.class);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
+  @Override
+  public void deleteProduct(int productId) {
+    try {
+      restTemplate.delete(productServiceUrl + "/" + productId);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
+  @Override
   public List<Recommendation> getRecommendations(int productId) {
 
     try {
@@ -108,6 +128,25 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
+  @Override
+  public Recommendation createRecommendation(Recommendation body) {
+    try {
+      return restTemplate.postForObject(recommendationServiceUrl, body, Recommendation.class);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
+  @Override
+  public void deleteRecommendations(int productId) {
+    try {
+      restTemplate.delete(recommendationServiceUrl + "/" + productId);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
+  @Override
   public List<Review> getReviews(int productId) {
 
     try {
@@ -127,42 +166,21 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   }
 
   @Override
-  public Product createProduct(Product body) {
+  public Review createReview(Review body) {
     try {
-
+      return restTemplate.postForObject(reviewServiceUrl, body, Review.class);
     } catch (HttpClientErrorException ex) {
       throw handleHttpClientException(ex);
     }
   }
 
   @Override
-  public void deleteProduct(int productId) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public Recommendation createRecommendation(Recommendation body) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public void deleteRecommendations(int productId) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public Review createReview(Review body) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
   public void deleteReviews(int productId) {
-    // TODO Auto-generated method stub
-
+    try {
+      restTemplate.delete(reviewServiceUrl + "/" + productId);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
   }
 
   private RuntimeException handleHttpClientException(HttpClientErrorException ex) {

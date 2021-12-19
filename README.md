@@ -1169,6 +1169,49 @@ spring:
 
 를 사용한다.
 
+#### handleHttpClientException
+
+```java
+private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
+  switch (ex.getStatusCode()) {
+    
+    case NOT_FOUND:
+      return new NotFoundException(getErrorMessage(ex));
+    
+    case UNPROCESSABLE_ENTITY:
+      return new InvalidInputException(getErrorMessage(ex));
+    
+    default:
+      LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
+      LOG.warn("Error body: {}", ex.getResponseBodyAsString());
+      return ex;
+  }
+}
+```
+
+#### 통합 계층에 메서드 추가
+
+```java
+// ProductCompositeIntegration.java
+  @Override
+  public Product createProduct(Product body) {
+    try {
+      return restTemplate.postForObject(productServiceUrl, body, Product.class);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+
+  @Override
+  public void deleteProduct(int productId) {
+    try {
+      restTemplate.delete(productServiceUrl + "/" + productId);
+    } catch (HttpClientErrorException ex) {
+      throw handleHttpClientException(ex);
+    }
+  }
+```
+
 #### composite api 구성
 
 ```java
