@@ -59,9 +59,16 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
   }
 
   @Override
-  public void deleteCompositeProduct(ProductAggregate body) {
-    // TODO Auto-generated method stub
+  public void deleteCompositeProduct(int productId) {
+    LOG.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
 
+    integration.deleteProduct(productId);
+
+    integration.deleteRecommendations(productId);
+
+    integration.deleteReviews(productId);
+
+    LOG.debug("getCompositeProduct: aggregate entities deleted for productId: {}", productId);
   }
 
   @Override

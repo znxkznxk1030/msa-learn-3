@@ -58,6 +58,6 @@ public interface ProductCompositeService {
       @ApiResponse(code = 422, message = "Unprocessable entity, input parameters caused the processing to fail. See response message for more information.")
   })
   @DeleteMapping(value = "/product-composite/{productId}")
-  void deleteCompositeProduct(@RequestBody ProductAggregate body);
+  void deleteCompositeProduct(@PathVariable int productId);
 
 }
