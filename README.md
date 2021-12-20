@@ -1212,7 +1212,7 @@ private RuntimeException handleHttpClientException(HttpClientErrorException ex) 
   }
 ```
 
-#### composite api 구성
+#### Integration API 구성
 
 ```java
 // api/src/../ProductCompositeService.java
@@ -1269,4 +1269,54 @@ public interface ProductCompositeService {
 
 ```
 
-![composite api 구성](./screen-shot/composite-swagger.png)
+![integration api 구성](./screen-shot/composite-swagger.png)
+
+#### Composite API Operation 구성
+
+##### createCompositeProduct
+
+```java
+@Override
+public void createCompositeProduct(ProductAggregate body) {
+  try {
+    LOG.debug("createCompositeProduct: creates a new composite entityfor productId: {}", body.getProductId());
+
+    Product product = new Product(body.getProductId(), body.getName(),body.getWeight(), null);
+
+    integration.createProduct(product);
+    if (body.getRecommendations() != null) {
+      body.getRecommendations().forEach(r -> {
+        Recommendation recommendation = new Recommendation(bodygetProductId(), r.getRecommendationId(), r.getAuthor(), r.getRat(), r.getContent(), null);
+        integration.createRecommendation(recommendation);
+      });
+    }
+
+    if (body.getReviews() != null) {
+      body.getReviews().forEach(r -> {
+        Review review = new Review(body.getProductId(), r.getReviewId(),r.getAuthor(), r.getSubject(), r.getContent(), null);
+      });
+    }
+    
+    LOG.debug("createCompositeProduct: composite entites created forproductId: {}", body.getProductId());
+  } catch (RuntimeException re) {
+    LOG.warn("createCompositeProduct failed", re);
+    throw re;
+  }
+}
+```
+
+##### deleteCompositeProduct
+
+```java
+
+@Override
+public void deleteCompositeProduct(int productId) {
+  LOG.debug("deleteCompositeProduct: Deletes a product aggregate forproductId: {}", productId);
+  
+  integration.deleteProduct(productId);
+  integration.deleteRecommendations(productId);
+  integration.deleteReviews(productId);
+
+  LOG.debug("getCompositeProduct: aggregate entities deleted forproductId: {}", productId);
+}
+```

@@ -47,6 +47,7 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
       if (body.getReviews() != null) {
         body.getReviews().forEach(r -> {
           Review review = new Review(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent(), null);
+          integration.createReview(review);
         });
       }
 

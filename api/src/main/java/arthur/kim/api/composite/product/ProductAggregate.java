@@ -10,6 +10,15 @@ public class ProductAggregate {
 		private final List<ReviewSummary> reviews;
 		private final ServiceAddresses serviceAddresses;
 
+    public ProductAggregate() {
+      this.productId = 0;
+      this.name = null;
+      this.weight = 0;
+      this.recommendations = null;
+      this.reviews = null;
+      this.serviceAddresses = null;
+    }
+
 		public ProductAggregate(
         int productId,
         String name,
