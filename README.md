@@ -4,12 +4,12 @@
 
 ### gradle 설정
 
-``` bash
+```bash
 buildscript {
   ext {
     springBootVersion = '2.1.0.RC1'
   }
-  
+
   repositories {
     mavenCentral ()
     maven { url "https://repo.spring.io/snapshot"}
@@ -58,7 +58,7 @@ test {
 
 ###  커맨드로 각 마이크로서비스 빌드
 
-``` bash
+```bash
 cd microservices/product-service; ./gradlew build; cd -; \
 cd microservices/product-composite-service; ./gradlew build; cd -; \
 cd microservices/recommendation-service; ./gradlew build; cd-; \
@@ -69,7 +69,7 @@ cd microservices/review-service; ./gradlew build; cd-;
 
 ### 1. settings.gradle 파일을 생성하고 그래들이 빌드할 프로젝트를 입력
 
-``` gradle
+```gradle
 include ':microservices:product-service'
 include ':microservices:review-service'
 include ':microservices:recommendation-service'
@@ -144,18 +144,18 @@ public class GlobalControllerExceptionHandler {
   public @ResponseBody HttpErrorInfo handleNotFoundExceptions(ServerHttpRequest request, Exception ex) {
     return createHttpErrorInfo(NOT_FOUND, request, ex);
   }
-  
+
   @ResponseStatus(UNPROCESSABLE_ENTITY)
   @ExceptionHandler(InvalidInputException.class)
   public @ResponseBody HttpErrorInfo handelInvalidInputException(ServerHttpRequest request, Exception ex) {
-    
+
     return createHttpErrorInfo(UNPROCESSABLE_ENTITY, request, ex);
   }
-  
+
   private HttpErrorInfo createHttpErrorInfo(HttpStatus httpStatus, ServerHttpRequest request, Exception ex) {
     final String path = request.getPath().pathWithinApplication().value();
     final String message = ex.getMessage();
-      
+
     LOG.debug("Returning HTTP status: {} for path: {}, message: {}", httpStatus, path, message);
     return new HttpErrorInfo(httpStatus, path, message);
   }
@@ -192,7 +192,7 @@ curl http://localhost:7000/product-composite/13 -i
 
 #### Test 검증에 실패한 케이스의 경우 build시 오류로 출력된다. ( + 빌드 실패 )
 
-``` bash
+```bash
 > Task :microservices:product-composite-service:test
 
 ProductCompositeServiceApplicationTests > getProductId() FAILED
@@ -257,7 +257,7 @@ public class GlobalControllerExceptionHandler {
       .expectBody()
       .jsonPath("$.message").isEqualTo("NOT FOUND: " + PRODUCT_ID_NOT_FOUND);
     }
-    
+
     @Test
     public void getProductInvalidInput() {
      client.get()
@@ -275,9 +275,9 @@ public class GlobalControllerExceptionHandler {
 
 #### assertCurl()
 
-``` bash
+```bash
 function assertCurl() {
-  
+
   local expectedHttpCode=$1
   local curlCmd="$2 -w\"%{http_code}\""
   local result=$(eval $curlCmd)
@@ -303,7 +303,7 @@ function assertCurl() {
 
 #### assertEqual()
 
-``` bash
+```bash
 function assertEqual() {
 
   local expected=$1
@@ -343,9 +343,9 @@ function assertEqual() {
 
 #### ${변수%단어}
 
-> 변수의 뒷부분부터 짧게 일치한 단어 삭제(예: echo ${string%b*c})
+> 변수의 뒷부분부터 짧게 일치한 단어 삭제(예: echo ${string%b\*c})
 
-``` bash
+```bash
 string="abc-efg-123-abc"
 echo ${string%b*c} # abc-efg-123-a
 echo ${string%???} # abc-efg-123-
@@ -353,8 +353,8 @@ echo ${string%???} # abc-efg-123-
 
 #### ./bash-test.bash: Permission denied
 
-``` bash
-chmod u+x ./bash-test.bash 
+```bash
+chmod u+x ./bash-test.bash
 # u stands for user.
 # g stands for group.
 # o stands for others.
@@ -513,34 +513,34 @@ docker logs my-prd-srv -f
 #### environment : 환경변수, 스프링 프로필 지정하기 위함
 
 ```yml
-version: '2.1'
+version: "2.1"
 
 services:
-   product:
-      build: microservices/product-service
-      mem_limit: 350m
-      environment:
-         - SPRING_PROFILES_ACTIVE=docker
-         
-   recommendation:
-      build: microservices/recommendation-service
-      mem_limit: 350m
-      environment:
-         - SPRING_PROFILES_ACTIVE=docker
+  product:
+    build: microservices/product-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
-   reivew:
-      build: microservices/reivew-service
-      mem_limit: 350m
-      environment:
-         - SPRING_PROFILES_ACTIVE=docker
+  recommendation:
+    build: microservices/recommendation-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 
-   product-composite:
-      build: microservices/product-composite-service
-      mem_limit: 350m
-      ports:
-         - "8080:8080"
-      environment:
-         - SPRING_PROFILES_ACTIVE=docker
+  reivew:
+    build: microservices/reivew-service
+    mem_limit: 350m
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+
+  product-composite:
+    build: microservices/product-composite-service
+    mem_limit: 350m
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
 ```
 
 ### 마이크로서비스 환경 시작
@@ -738,7 +738,6 @@ public interface ProductCompositeService {
 
 ```yml
 api:
-
   common:
     version: 1.0.0
     title: Sample API
@@ -781,14 +780,14 @@ api:
         ## Negative product ids
         422 - An <b>Unprocessable Entity</b> error will be returned
 ```
-  
-### swagger-ui  이슈
+
+### swagger-ui 이슈
 
 > 스프링 - 2.3.x, swagger - 3.0.0 버전에서는 페이지가 안뜨는 이슈가 있다.
 
 <https://stackoverflow.com/questions/48311447/springboot-swagger-url-shows-whitelabel-error-page>
 
-### swagger-ui  접속
+### swagger-ui 접속
 
 > <http://localhost:8080/swagger-ui/index.html>
 
@@ -813,7 +812,7 @@ dependencies {
    // mapstruct
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    
+
     testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
 }
 ```
@@ -921,19 +920,19 @@ public interface ProductRepository extends PagingAndSortingRepository<ProductEnt
 @DataMongoTest
 //@TestInstance(Lifecycle.PER_CLASS)  // BeforeAll 을 static이 아닌 함수로 사용시
 public class PersistenceTests {
- 
+
  @Autowired
  private ProductRepository repository;
- 
+
  private ProductEntity savedEntity;
 
   @BeforeEach
  public void setupDb() {
   repository.deleteAll();
-  
+
   ProductEntity entity = new ProductEntity(1, "n", 1);
   savedEntity = repository.save(entity);
-  
+
   assertEqualsProduct(entity, savedEntity);
  }
 }
@@ -946,10 +945,10 @@ public class PersistenceTests {
  public void create() {
   ProductEntity newEntity = new ProductEntity(2, "n", 2);
   savedEntity = repository.save(newEntity);
-  
+
   ProductEntity foundEntity = repository.findById(newEntity.getId()).get();
   assertEqualsProduct(newEntity, foundEntity);
-  
+
   assertEquals(2, repository.count());
  }
 ```
@@ -961,9 +960,9 @@ public class PersistenceTests {
  public void update() {
   savedEntity.setName("n2");
   repository.save(savedEntity);
-  
+
   ProductEntity foundEntity = repository.findById(savedEntity.getId()).get();
-  
+
   assertEquals(1, (long)foundEntity.getVersion());
   assertEquals("n2", foundEntity.getName());
  }
@@ -1011,10 +1010,10 @@ public class PersistenceTests {
 ```yml
 # application.yml
 spring.data.mongodb:
-    host: localhost
-    port: 27017
-    database: product-db
-    auto-index-creation: true
+  host: localhost
+  port: 27017
+  database: product-db
+  auto-index-creation: true
 ```
 
 #### 낙관적 잠금 메커니즘 테스트
@@ -1022,25 +1021,25 @@ spring.data.mongodb:
 ```java
 @Test
  public void optimisticLockError() {
-  
+
   // 데이터베이스에서 가져온 엔티티를 변수 2개에 저장한다.
   ProductEntity entity1 = repository.findById(savedEntity.getId()).get();
   ProductEntity entity2 = repository.findById(savedEntity.getId()).get();
-  
+
   // 첫 번째 엔티티 객체를 업데이트 한다.
   entity1.setName("n1");
   repository.save(entity1);
-  
+
   // 두 번째 엔티티 객체를 업데이트한다.
   // 두 번째 엔티티 객체의 버전이 낮으므로 실패한다.
   // 즉 낙관적 잠금 오류가 발생해 실패한다.
   try {
    entity2.setName("n2");
    repository.save(entity2);
-   
+
    fail("Expected an OptimisticLockingFailureException");
   } catch (OptimisticLockingFailureException e) {}
-  
+
   // 데이터베이스에서 업데이트된 엔티티를 가져와서 새로운 값을 확인한다.
   ProductEntity updatedEntity = repository.findById(savedEntity.getId()).get();
   assertEquals(1, (int)updatedEntity.getVersion());
@@ -1057,7 +1056,7 @@ spring.data.mongodb:
   List<ProductEntity> newProducts = rangeClosed(1001, 1010)
     .mapToObj(i -> new ProductEntity(i, "name " + i, i)).collect(Collectors.toList());
   repository.saveAll(newProducts);
-  
+
   PageRequest nextPage = PageRequest.of(0, 4, Direction.ASC, "productId");
   Page<ProductEntity> productPage = repository.findAll(nextPage);
   assertEquals("[1001, 1002, 1003, 1004]", productPage.getContent().stream().map(p -> p.getProductId()).collect(Collectors.toList()).toString());
@@ -1065,7 +1064,7 @@ spring.data.mongodb:
 //  nextPage = testNextPage(nextPage, "[1001, 1002, 1003, 1004]", true);
 //  nextPage = testNextPage(nextPage, "[1005, 1006, 1007, 1008]", true);
 //  nextPage = testNextPage(nextPage, "[1009, 1010]", false);
-    
+
  }
 ```
 
@@ -1098,7 +1097,7 @@ void deleteProduct(@PathVariable int productId);
 ```java
 @Mapper(componentModel = "spring")
 public interface RecommendationMapper {
- 
+
  @Mappings({
   @Mapping(target = "rate", source="entity.rating"),
   @Mapping(target = "serviceAddress", ignore = true)
@@ -1111,7 +1110,7 @@ public interface RecommendationMapper {
   @Mapping(target = "version", ignore = true)
  })
  RecommendationEntity apiToEntity(Recommendation api);
- 
+
  List<Recommendation> entityListToApiList(List<RecommendationEntity> entity);
  List<RecommendationEntity> apiListToEntityList(List<Recommendation> api);
 }
@@ -1139,7 +1138,7 @@ public interface RecommendationMapper {
 1 error
 ```
 
-##### Vscode | The import of ** cannot be resolved 에러
+##### Vscode | The import of \*\* cannot be resolved 에러
 
 > cmd + shift + P \
 > Java: Clean Java Language Server Workspace
@@ -1174,13 +1173,13 @@ spring:
 ```java
 private RuntimeException handleHttpClientException(HttpClientErrorException ex) {
   switch (ex.getStatusCode()) {
-    
+
     case NOT_FOUND:
       return new NotFoundException(getErrorMessage(ex));
-    
+
     case UNPROCESSABLE_ENTITY:
       return new InvalidInputException(getErrorMessage(ex));
-    
+
     default:
       LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
       LOG.warn("Error body: {}", ex.getResponseBodyAsString());
@@ -1296,7 +1295,7 @@ public void createCompositeProduct(ProductAggregate body) {
         Review review = new Review(body.getProductId(), r.getReviewId(),r.getAuthor(), r.getSubject(), r.getContent(), null);
       });
     }
-    
+
     LOG.debug("createCompositeProduct: composite entites created forproductId: {}", body.getProductId());
   } catch (RuntimeException re) {
     LOG.warn("createCompositeProduct failed", re);
@@ -1312,11 +1311,48 @@ public void createCompositeProduct(ProductAggregate body) {
 @Override
 public void deleteCompositeProduct(int productId) {
   LOG.debug("deleteCompositeProduct: Deletes a product aggregate forproductId: {}", productId);
-  
+
   integration.deleteProduct(productId);
   integration.deleteRecommendations(productId);
   integration.deleteReviews(productId);
 
   LOG.debug("getCompositeProduct: aggregate entities deleted forproductId: {}", productId);
 }
+```
+
+#### 도커 컴포즈 환경에 데이터베이스 추가
+
+##### mongodb 추가
+
+> $ mongo
+
+```yml
+mongodb:
+  image: mongo:3.6.9
+  mem_limit: 350m
+  ports:
+    - "27017:27017"
+  command: mongod --smallfiles
+```
+
+##### mysql 추가
+
+> $ mysql -uroot -h127.0.0.1 -p
+
+```yml
+  mysql:
+    image: mysql:5.7
+    mem_limit: 350m
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=review-db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-uuser", "-ppwd", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 ```
