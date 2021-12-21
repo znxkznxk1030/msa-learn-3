@@ -56,8 +56,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
     productServiceUrl = "http://" + productServiceHost + ":" + productServicePort + "/product/";
     recommendationServiceUrl = "http://" + recommendationServiceHost + ":" + recommendationServicePort
-        + "/recommendation?productId=";
-    reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review?productId=";
+        + "/recommendation";
+    reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
   }
 
   @Override
