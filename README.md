@@ -1359,3 +1359,73 @@ mongodb:
 
 #### 각 서비스에 데이터베이스 연결
 
+##### mongodb 연결
+
+```yml
+spring:
+  config.activate.on-profile: docker
+  data:
+    mongodb:
+      host: mongodb
+      port: 27017
+      database: product-db
+      auto-index-creation: true
+
+server.port: 8080
+```
+
+##### mysql 연결
+
+```yml
+spring.jpa.hibernate.ddl-auto: update
+
+spring.datasource:
+  url: jdbc:mysql://localhost/review-db
+  username: user
+  password: pwd
+
+spring.datasource.hikari.initializationFailTimeout: 60000
+    
+---
+spring.config.activate.on-profile: docker
+
+spring.datasource:
+  url: jdbc:mysql://mysql/review-db
+
+server.port: 8080
+```
+
+#### 데이터베이스 확인하기
+
+##### swagger-ui 를 이용한 product 자료 생성 요청
+
+![swagger-ui 를 이용한 product 생성 요청](./screen-shot/swagger-create.png)
+
+##### mongodb 확인
+
+```bash
+docker-compose exec mongodb mongo recommendation-db --quiet --eval "db.recommendations.find()"
+```
+
+> result
+
+```bash
+{ "_id" : ObjectId("61c1f0e8a5ea8e57eebfe495"), "version" : 0, "productId" : 123, "recommendationId" : 0, "author" : "string", "rating" : 0, "content" : "string", "_class" : "arthur.kim.microservices.core.recommendation.persistence.RecommendationEntity" }
+```
+
+##### mysql 확인
+
+```bash
+docker-compose exec mysql mysql -uuser -p review-db -e "select * from reviews"
+```
+
+> result
+
+```bash
+Enter password:
++----+--------+---------+------------+-----------+---------+---------+
+| id | author | content | product_id | review_id | subject | version |
++----+--------+---------+------------+-----------+---------+---------+
+|  1 | string | string  |        123 |         0 | string  |       0 |
++----+--------+---------+------------+-----------+---------+---------+
+```

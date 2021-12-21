@@ -140,7 +140,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   @Override
   public void deleteRecommendations(int productId) {
     try {
-      restTemplate.delete(recommendationServiceUrl + "/" + productId);
+      restTemplate.delete(recommendationServiceUrl + "?productId=" + productId);
     } catch (HttpClientErrorException ex) {
       throw handleHttpClientException(ex);
     }
@@ -177,7 +177,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   @Override
   public void deleteReviews(int productId) {
     try {
-      restTemplate.delete(reviewServiceUrl + "/" + productId);
+      restTemplate.delete(reviewServiceUrl + "?productId=" + productId);
     } catch (HttpClientErrorException ex) {
       throw handleHttpClientException(ex);
     }

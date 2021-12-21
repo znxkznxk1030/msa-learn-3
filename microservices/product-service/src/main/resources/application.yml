@@ -6,9 +6,9 @@ logging:
     arthur.kim: DEBUG
   
 spring.data.mongodb:
-  host: localhost
-  port: 27017
-  database: product-db
+  # host: localhost
+  # port: 27017
+  # database: product-db
   auto-index-creation: true
 
 ---
@@ -17,5 +17,7 @@ spring:
   data:
     mongodb:
       host: mongodb
+      port: 27017
+      database: product-db
 
 server.port: 8080
