@@ -1356,3 +1356,6 @@ mongodb:
       timeout: 5s
       retries: 10
 ```
+
+#### 각 서비스에 데이터베이스 연결
+

@@ -6,18 +6,16 @@ logging:
     arthur.kim: DEBUG
   
 spring.data.mongodb:
-  #  host: localhost
-  #  port: 27017
-  #  database: product-db
+  host: localhost
+  port: 27017
+  database: product-db
   auto-index-creation: true
 
 ---
-spring.profiles: docker
-
-spring.data.mongodb:
-  #  host: localhost
-  #  port: 27017
-  #  database: product-db
-  auto-index-creation: true
+spring:
+  config.activate.on-profile: docker
+  data:
+    mongodb:
+      host: mongodb
 
 server.port: 8080
