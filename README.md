@@ -1340,21 +1340,21 @@ mongodb:
 > $ mysql -uroot -h127.0.0.1 -p
 
 ```yml
-  mysql:
-    image: mysql:5.7
-    mem_limit: 350m
-    ports:
-      - "3306:3306"
-    environment:
-      - MYSQL_ROOT_PASSWORD=rootpwd
-      - MYSQL_DATABASE=review-db
-      - MYSQL_USER=user
-      - MYSQL_PASSWORD=pwd
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-uuser", "-ppwd", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 10
+mysql:
+  image: mysql:5.7
+  mem_limit: 350m
+  ports:
+    - "3306:3306"
+  environment:
+    - MYSQL_ROOT_PASSWORD=rootpwd
+    - MYSQL_DATABASE=review-db
+    - MYSQL_USER=user
+    - MYSQL_PASSWORD=pwd
+  healthcheck:
+    test: ["CMD", "mysqladmin", "ping", "-uuser", "-ppwd", "-h", "localhost"]
+    interval: 10s
+    timeout: 5s
+    retries: 10
 ```
 
 #### 각 서비스에 데이터베이스 연결
@@ -1385,7 +1385,7 @@ spring.datasource:
   password: pwd
 
 spring.datasource.hikari.initializationFailTimeout: 60000
-    
+
 ---
 spring.config.activate.on-profile: docker
 
@@ -1451,3 +1451,39 @@ Enter password:
 - core 마이크로 서비스들의 읽기 서비스는 응답을 기다리는 엔드유저가 있기 때문에 논블로킹 동기 API로 개발한다.
 - core 마이크로 서비스들의 생성 및 삭제 서비스는 이벤트 기반 비동기 서비스로 개발한다.
 - product-composite 마이크로 서비스에서 생성 및 삭제를 위해 제공하는 동기 API는 이벤트를 emit할 때, 바로 200 응답을 반환한다.
+
+### Reactor
+
+- Reactor By Example : <https://www.infoq.com/articles/reactor-by-example/>
+
+#### Test For Reactor
+
+```java
+  @Test
+  public void TestFlux() {
+    List<Integer> list = new ArrayList<>();
+
+    Flux<Integer> subs = Flux.just(1, 2, 3, 4)
+        .filter(n -> n % 2 == 0)
+        .map(n -> n * 2)
+        .log();
+
+    subs.subscribe(n -> list.add(n));
+
+    assertThat(list, contains(4, 8));
+  }
+
+  @Test
+  public void TestFluxBlocking() {
+
+    List<Integer> list = Flux.just(1, 2, 3, 4)
+        .filter(n -> n % 2 == 0)
+        .map(n -> n * 2).log()
+        .collectList()
+        .block();
+
+    assertThat(list, contains(4, 8));
+  }
+```
+
+![reactor test](./screen-shot/reactor-test.png)
