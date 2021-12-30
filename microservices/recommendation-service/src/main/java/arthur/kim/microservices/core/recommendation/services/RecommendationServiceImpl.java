@@ -1,6 +1,5 @@
 package arthur.kim.microservices.core.recommendation.services;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.mongodb.DuplicateKeyException;
