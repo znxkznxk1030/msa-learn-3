@@ -138,14 +138,6 @@ public class PersistenceTests {
 				
 	}
 	
-	private PageRequest testNextPage(PageRequest nextPage, String expectedProductIds, boolean expectsNextPage) {
-		Page<ProductEntity> productPage = repository.findAll(nextPage);
-		assertEquals(expectedProductIds, productPage.getContent().stream().map(p -> p.getProductId()).collect(Collectors.toList()).toString());
-		assertEquals(expectsNextPage, productPage.hasNext());
-		return (PageRequest) productPage.nextPageable();
-	}
-	
-	
 	private void assertEqualsProduct(ProductEntity expectedEntity, ProductEntity actualEntity) {
 		assertEquals(expectedEntity.getId(),			actualEntity.getId());
 		assertEquals(expectedEntity.getVersion(),		actualEntity.getVersion());

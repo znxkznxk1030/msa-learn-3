@@ -2,8 +2,6 @@ package arthur.kim.microservices.core.recommendation;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
@@ -19,8 +17,6 @@ import static reactor.core.publisher.Mono.just;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {"spring.data.mongodb.port: 0"})
 class RecommendationServiceApplicationTests {
-  private static final Logger LOG = LoggerFactory.getLogger(RecommendationServiceApplicationTests.class);
-
   @Autowired
   private WebTestClient client;
 
@@ -45,9 +41,6 @@ class RecommendationServiceApplicationTests {
     postAndVerifyRecommendation(productId, 3, OK);
 
     assertEquals(3, repository.findByProductId(productId).size());
-    
-    WebTestClient.BodyContentSpec spec = getAndVerifyRecommendationsByProductId(productId, OK);
-    // String path = spec.json("$.path").toString();
 
     // String message = spec.json( "$.message").toString();
         
@@ -99,11 +92,7 @@ class RecommendationServiceApplicationTests {
     getAndVerifyRecommendationsByProductId("?productId=" + productIdInvalid, UNPROCESSABLE_ENTITY);
   }
 
-  private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(int productId, HttpStatus expectedStatus) {
-		return getAndVerifyRecommendationsByProductId("?productId=" + productId, expectedStatus);
-	}
-
-	private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(String productIdQuery, HttpStatus expectedStatus) {
+  private WebTestClient.BodyContentSpec getAndVerifyRecommendationsByProductId(String productIdQuery, HttpStatus expectedStatus) {
 		return client.get()
 			.uri("/recommendation" + productIdQuery)
 			.accept(APPLICATION_JSON)
