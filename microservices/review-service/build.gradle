@@ -17,6 +17,8 @@ repositories {
 }
 
 dependencies {
+  implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-webflux')
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	
@@ -28,6 +30,7 @@ dependencies {
   annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
     
   testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}" // if you are using mapstruct in test code
+  
   // JPA & MySql
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'mysql:mysql-connector-java'

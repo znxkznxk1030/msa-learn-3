@@ -1565,3 +1565,31 @@ public Scheduler jdbcScheduler() {
 }
 
 ```
+
+#### 블로킹 코드인 getReviews를 Flux로 반환 시키기
+
+```java
+private <T> Flux<T> asyncFlux(Iterable<T> iterable) {
+ return Flux.fromIterable(iterable).publishOn(scheduler);
+}
+```
+
+```java
+protected List<Review> getByProductId(int productId) {
+  List<ReviewEntity> entityList = repository.findByProductId(productId);
+  List<Review> list = mapper.entityListToApiList(entityList);
+  list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
+  
+  return list;
+ }
+```
+
+```java
+@Override
+ public Flux<Review> getReviews(int productId) {
+  
+  if ( productId < 1 ) throw new InvalidInputException("Invalid productId: " + productId);
+  
+  return asyncFlux(getByProductId(productId)).log();
+ }
+```
