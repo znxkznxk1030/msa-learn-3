@@ -1593,3 +1593,42 @@ protected List<Review> getByProductId(int productId) {
   return asyncFlux(getByProductId(productId)).log();
  }
 ```
+
+### 복합 서비스의 논블로킹 REST API
+
+#### 각 마이크로 서비스의 get 변경
+
+```java
+  @Override
+  public Mono<Product> getProduct(int productId) {
+    String url = productServiceUrl + "/product/" + productId;
+    return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log().onErrorMap(WebClientResponseException.class, ex -> handleException(ex));
+  }
+
+  @Override
+  public Flux<Recommendation> getRecommendations(int productId) {
+    String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
+
+    return webClient.get().uri(url).retrieve().bodyToFlux(Recommendation.class).log().onErrorResume(error -> empty());
+  }
+
+  @Override
+  public Flux<Recommendation> getRecommendations(int productId) {
+    String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
+
+    return webClient.get().uri(url).retrieve().bodyToFlux(Recommendation.class).log().onErrorResume(error -> empty());
+  }
+```
+
+#### getCompositeProduct 변경
+
+```java
+public Mono<ProductAggregate> getCompositeProduct(int productId) {
+  return Mono.zip(values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1], (List<Review>) values[2], serviceUtil.getServiceAddress()), 
+  integration.getProduct(productId),
+  integration.getRecommendations(productId).collectList(),
+  integration.getReviews(productId).collectList())
+ .doOnError(ex -> LOG.warn("getCompositeProduct failed: {}", ex.toString()))
+ .log();
+}
+```
