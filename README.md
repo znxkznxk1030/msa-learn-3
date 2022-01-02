@@ -1487,3 +1487,36 @@ Enter password:
 ```
 
 ![reactor test](./screen-shot/reactor-test.png)
+
+### MongoDb | ReactiveCrudRepository 로 변경
+
+- 이제 영속성 메소드가 Mono나 Flux 객체를 반환하므로, 메서드는 반환된 리액티브 객체에서 결과를 받을 때까지 기다려야 한다.
+
+#### RecommendationRepository.java
+
+```java
+public interface RecommendationRepository extends ReactiveCrudRepository<RecommendationEntity, String>{
+ Flux<RecommendationEntity> findByProductId(int productId);
+}
+```
+
+#### RecommendationServiceImpl.java
+
+```java
+  @Override
+  public Recommendation createRecommendation(Recommendation body) {
+    RecommendationEntity entity = mapper.apiToEntity(body);
+    Mono<Recommendation> newEntity = repository.save(entity)
+        .log()
+        .onErrorMap(
+            DuplicateKeyException.class,
+            ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:"
+                + body.getRecommendationId()))
+        .map(e -> mapper.entityToApi(e));
+
+    LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(),
+        body.getRecommendationId());
+
+    return newEntity.block();
+  }
+```

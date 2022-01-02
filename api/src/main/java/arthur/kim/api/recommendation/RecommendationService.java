@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import reactor.core.publisher.Flux;
+
 public interface RecommendationService {
 	/**
 	 * Sample usage: curl $HOST:$PORT/recommendation?productId=1
@@ -18,7 +20,7 @@ public interface RecommendationService {
 	@GetMapping(
 			value	 = "/recommendation",
 			produces = "application/json")
-	List<Recommendation> getRecommendations(@RequestParam(value = "productId", required = true) int productId);
+	Flux<Recommendation> getRecommendations(@RequestParam(value = "productId", required = true) int productId);
 	
 	@PostMapping(
 			value	 = "/recommendation",
