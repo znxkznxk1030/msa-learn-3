@@ -1488,6 +1488,13 @@ Enter password:
 
 ![reactor test](./screen-shot/reactor-test.png)
 
+### 핵심 서비스으이 논블로킹 REST API
+
+- 리액티브 데이터 유형을 반환하도록 API를 변경한다.
+- 서비스 구현을 변경해 블로킹 코드를 제거한다.
+- 리액티브 서비스를 테스트할 수 있도록 테스트를 변경한다.
+- 논블로킹 코드와 계속 블로킹 방식을 사용해야 하는 코드를 분리한다.
+
 ### MongoDb | ReactiveCrudRepository 로 변경
 
 - 이제 영속성 메소드가 Mono나 Flux 객체를 반환하므로, 메서드는 반환된 리액티브 객체에서 결과를 받을 때까지 기다려야 한다.
@@ -1538,3 +1545,23 @@ public void setupDb() {
 
 ### 블로킹 코드 처리
 
+- JPA를 사용해 관계형 데이터베이스의 데이터에 접근하는 review 서비스는 논블로킹 프로그래밍 모델을 사용하지 않고 Scheduler를 사용해 블로킹 코드를 실행한다.
+- 스케쥴러는 일정 수의 스레드를 보유한 전용 스레드 풀의 스레드에서 블로킹 코드를 실행한다.
+- 스레드 풀을 사용해 블로킹 코드를 처리하면 마이크로서비스에서 사용할 스레드의 고갈을 방지하므로 마이크로서비스의 논블로킹 처리에 영향을 주지 않는다.
+
+#### ReviewServiceApplication에 스레드풀 구성
+
+```java
+@Autowired
+public ReviewServiceApplication(
+    @Value("${spring.datasource.maximum-pool-size:10}") Integer connectionPoolSize) {
+  this.connectionPoolSize = connectionPoolSize;
+}
+
+@Bean
+public Scheduler jdbcScheduler() {
+  LOG.info("Creates a jdbcScheduler with connectionPoolSize = " + connectionPoolSize);
+  return Schedulers.fromExecutor(Executors.newFixedThreadPool(connectionPoolSize));
+}
+
+```
