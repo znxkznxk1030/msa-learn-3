@@ -1506,19 +1506,35 @@ public interface RecommendationRepository extends ReactiveCrudRepository<Recomme
 
 ```java
   @Override
-  public Recommendation createRecommendation(Recommendation body) {
-    RecommendationEntity entity = mapper.apiToEntity(body);
-    Mono<Recommendation> newEntity = repository.save(entity)
+  public Flux<Recommendation> getRecommendations(int productId) {
+    if (productId < 1)
+      throw new InvalidInputException("Invalid productId: " + productId);
+
+    return repository.findByProductId(productId)
         .log()
-        .onErrorMap(
-            DuplicateKeyException.class,
-            ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:"
-                + body.getRecommendationId()))
-        .map(e -> mapper.entityToApi(e));
-
-    LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(),
-        body.getRecommendationId());
-
-    return newEntity.block();
+        .map(e -> mapper.entityToApi(e))
+        .map(e -> {
+          e.setServiceAddress(serviceUtil.getServiceAddress());
+          return e;
+        });
   }
 ```
+
+#### TEST | PersistenceTests
+
+```java
+@BeforeEach
+public void setupDb() {
+  StepVerifier.create(repository.deleteAll()).verifyComplete();
+
+  ProductEntity entity = new ProductEntity(1, "n", 1);
+  StepVerifier.create(repository.save(entity))
+      .expectNextMatches(createdEntity -> {
+        savedEntity = createdEntity;
+        return areProductEqual(entity, savedEntity);
+      }).verifyComplete();
+}
+```
+
+### 블로킹 코드 처리
+

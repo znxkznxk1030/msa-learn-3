@@ -2,7 +2,7 @@ package arthur.kim.microservices.core.recommendation.services;
 
 import java.util.List;
 
-import org.springframework.dao.DuplicateKeyException;
+import com.mongodb.DuplicateKeyException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,6 @@ import arthur.kim.microservices.core.recommendation.persistence.RecommendationRe
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.http.ServiceUtil;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @RestController
 public class RecommendationServiceImpl implements RecommendationService {
@@ -39,7 +38,6 @@ public class RecommendationServiceImpl implements RecommendationService {
 
   @Override
   public Flux<Recommendation> getRecommendations(int productId) {
-
     if (productId < 1)
       throw new InvalidInputException("Invalid productId: " + productId);
 
@@ -52,29 +50,28 @@ public class RecommendationServiceImpl implements RecommendationService {
         });
   }
 
-  @Override
-  public Recommendation createRecommendation(Recommendation body) {
-    RecommendationEntity entity = mapper.apiToEntity(body);
-    Mono<Recommendation> newEntity = repository.save(entity)
-        .log()
-        .onErrorMap(
-            DuplicateKeyException.class,
-            ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:"
-                + body.getRecommendationId()))
-        .map(e -> mapper.entityToApi(e));
+  // @Override
+  // public Recommendation createRecommendation(Recommendation body) {
+  //   try {
+  //     RecommendationEntity entity = mapper.apiToEntity(body);
+  //     RecommendationEntity newEntity = repository.save(entity);
 
-    LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(),
-        body.getRecommendationId());
+  //     LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(),
+  //         body.getRecommendationId());
 
-    return newEntity.block();
-  }
+  //     return mapper.entityToApi(newEntity);
+  //   } catch (DuplicateKeyException dke) {
+  //     throw new InvalidInputException(
+  //         "Duplicate Key, Product Id: " + body.getProductId() + ", Recommendation Id: " + body.getRecommendationId());
+  //   } catch (Exception e) {
+  //     throw new InvalidInputException(
+  //         "Duplicate Key, Product Id: " + body.getProductId() + ", Recommendation Id: " + body.getRecommendationId());
+  //   }
+  // }
 
-  @Override
-  public void deleteRecommendations(int productId) {
-    if (productId < 1)
-      throw new InvalidInputException("Invalid productId: " + productId);
-
-    LOG.debug("deleteRecommendation: tried to delete recommendations for the product with productId: {}", productId);
-    repository.deleteAll(repository.findByProductId(productId)).block();
-  }
+  // @Override
+  // public void deleteRecommendations(int productId) {
+  //   LOG.debug("deleteRecommendation: tried to delete recommendations for the product with productId: {}", productId);
+  //   repository.deleteAll(repository.findByProductId(productId));
+  // }
 }

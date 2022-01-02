@@ -15,6 +15,9 @@ import arthur.kim.microservices.core.product.persistence.ProductRepository;
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
 import arthur.kim.util.http.ServiceUtil;
+import reactor.core.publisher.Mono;
+
+import static reactor.core.publisher.Mono.error;
 
 @RestController
 public class ProductServiceImpl implements ProductService {
@@ -32,49 +35,49 @@ public class ProductServiceImpl implements ProductService {
   }
 
   @Override
-  public Product getProduct(int productId) {
-    LOG.debug("/product return the found product for productId={}", productId);
-
+  public Mono<Product> getProduct(int productId) {
     if (productId < 1)
       throw new InvalidInputException("Invalid productId: " + productId);
 
-    ProductEntity entity = repository.findByProductId(productId)
-        .orElseThrow(() -> new NotFoundException("No Product found for productId: " + productId));
-
-    Product response = mapper.entityToApi(entity);
-    response.setServiceAddress(serviceUtil.getServiceAddress());
-    return response;
+    return repository.findByProductId(productId)
+        .switchIfEmpty(error(new NotFoundException("No product found for productId: " + productId)))
+        .log()
+        .map(e -> mapper.entityToApi(e))
+        .map(e -> {
+          e.setServiceAddress(serviceUtil.getServiceAddress());
+          return e;
+        });
   }
 
-  @Override
-  public Product createProduct(Product body) {
-    try {
-      ProductEntity entity = mapper.apiToEntity(body);
-      ProductEntity newEntity = repository.save(entity);
-      return mapper.entityToApi(newEntity);
-    } catch (DuplicateKeyException dke) {
-      throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
-    } catch (MongoWriteException mwe) {
-      LOG.debug("MongoWriteException error code : {}", mwe.getCode());
-      LOG.debug("MongoWriteException error label : {}", mwe.getErrorLabels());
-      if (mwe.getCode() == 11000) {
-        throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
-      }
-      throw mwe;
-    } catch (Exception e) {
-      LOG.debug("error message : {}", e.getMessage());
-      LOG.debug("error class : {}", e.getClass());
-      LOG.debug("error localized Message : {}", e.getLocalizedMessage());
-      // throw new InvalidInputException("Duplicate Key, Product Id: " +
-      // body.getProductId());
-      throw e;
-    }
-  }
+  // @Override
+  // public Product createProduct(Product body) {
+  //   try {
+  //     ProductEntity entity = mapper.apiToEntity(body);
+  //     ProductEntity newEntity = repository.save(entity);
+  //     return mapper.entityToApi(newEntity);
+  //   } catch (DuplicateKeyException dke) {
+  //     throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
+  //   } catch (MongoWriteException mwe) {
+  //     LOG.debug("MongoWriteException error code : {}", mwe.getCode());
+  //     LOG.debug("MongoWriteException error label : {}", mwe.getErrorLabels());
+  //     if (mwe.getCode() == 11000) {
+  //       throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
+  //     }
+  //     throw mwe;
+  //   } catch (Exception e) {
+  //     LOG.debug("error message : {}", e.getMessage());
+  //     LOG.debug("error class : {}", e.getClass());
+  //     LOG.debug("error localized Message : {}", e.getLocalizedMessage());
+  //     // throw new InvalidInputException("Duplicate Key, Product Id: " +
+  //     // body.getProductId());
+  //     throw e;
+  //   }
+  // }
 
-  @Override
-  public void deleteProduct(int productId) {
-    repository.findByProductId(productId).ifPresent(e -> repository.delete(e));
+  // @Override
+  // public void deleteProduct(int productId) {
+  //   repository.findByProductId(productId).ifPresent(e -> repository.delete(e));
 
-  }
+  // }
 
 }

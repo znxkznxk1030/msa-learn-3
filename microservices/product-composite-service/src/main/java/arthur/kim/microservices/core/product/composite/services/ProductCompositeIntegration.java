@@ -9,6 +9,8 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import arthur.kim.api.product.Product;
 import arthur.kim.api.product.ProductService;
 import arthur.kim.api.recommendation.Recommendation;
@@ -18,19 +20,23 @@ import arthur.kim.api.review.ReviewService;
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
 import arthur.kim.util.http.HttpErrorInfo;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
+import static reactor.core.publisher.Flux.empty;
 
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
 
   private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
+  private final WebClient webClient;
   private final RestTemplate restTemplate;
+
   private final ObjectMapper mapper;
 
   private final String productServiceUrl;
@@ -39,6 +45,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Autowired
   public ProductCompositeIntegration(
+      WebClient.Builder webClient,
       RestTemplate restTemplate,
       ObjectMapper mapper,
 
@@ -51,6 +58,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
       @Value("${app.review-service.host}") String reviewServiceHost,
       @Value("${app.review-service.port}") int reviewServicePort) {
 
+    this.webClient = webClient.build();
     this.restTemplate = restTemplate;
     this.mapper = mapper;
 
@@ -109,23 +117,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   }
 
   @Override
-  public List<Recommendation> getRecommendations(int productId) {
+  public Flux<Recommendation> getRecommendations(int productId) {
+    String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
 
-    try {
-      String url = recommendationServiceUrl + productId;
-
-      LOG.debug("Will call getRecommendations API on URL: {}", url);
-      List<Recommendation> recommendations = restTemplate
-          .exchange(url, GET, null, new ParameterizedTypeReference<List<Recommendation>>() {
-          }).getBody();
-
-      LOG.debug("Found {} recommendations for a product with id: {}", recommendations.size(), productId);
-      return recommendations;
-
-    } catch (Exception ex) {
-      LOG.warn("Got an exception while requesting recommendations, return zero recommendations: {}", ex.getMessage());
-      return new ArrayList<>();
-    }
+    return webClient.get().uri(url).retrieve().bodyToFlux(Recommendation.class).log().onErrorResume(error -> empty());
   }
 
   @Override
@@ -188,10 +183,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
       case NOT_FOUND:
         return new NotFoundException(getErrorMessage(ex));
-      
+
       case UNPROCESSABLE_ENTITY:
         return new InvalidInputException(getErrorMessage(ex));
-      
+
       default:
         LOG.warn("Got a unexpected HTTP error: {}, will rethrow it", ex.getStatusCode());
         LOG.warn("Error body: {}", ex.getResponseBodyAsString());

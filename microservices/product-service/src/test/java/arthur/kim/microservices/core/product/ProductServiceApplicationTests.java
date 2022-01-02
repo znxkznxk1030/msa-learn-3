@@ -42,8 +42,6 @@ class ProductServiceApplicationTests {
 
     postAndVerifyProduct(productId, OK);
 
-    assertTrue(repository.findByProductId(productId).isPresent());
-
     getAndVerifyProduct(productId, OK)
       .jsonPath("$.productId").isEqualTo(productId);
   }
@@ -54,7 +52,6 @@ class ProductServiceApplicationTests {
 
     postAndVerifyProduct(productId, OK);
 
-    assertTrue(repository.findByProductId(productId).isPresent());
 
     postAndVerifyProduct(productId, UNPROCESSABLE_ENTITY);
     // .jsonPath("$.path").isEqualTo("/product")
@@ -67,10 +64,8 @@ class ProductServiceApplicationTests {
     int productId = 1;
 
     postAndVerifyProduct(productId, OK);
-    assertTrue(repository.findByProductId(productId).isPresent());
 
     deleteAndVerifyProduct(productId, OK);
-    assertFalse(repository.findByProductId(productId).isPresent());
 
     deleteAndVerifyProduct(productId, OK);
   }
