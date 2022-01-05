@@ -19,6 +19,8 @@ import reactor.core.publisher.Mono;
 
 import static reactor.core.publisher.Mono.error;
 
+import java.util.function.Function;
+
 @RestController
 public class ProductServiceImpl implements ProductService {
 
@@ -49,35 +51,28 @@ public class ProductServiceImpl implements ProductService {
         });
   }
 
-  // @Override
-  // public Product createProduct(Product body) {
-  //   try {
-  //     ProductEntity entity = mapper.apiToEntity(body);
-  //     ProductEntity newEntity = repository.save(entity);
-  //     return mapper.entityToApi(newEntity);
-  //   } catch (DuplicateKeyException dke) {
-  //     throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
-  //   } catch (MongoWriteException mwe) {
-  //     LOG.debug("MongoWriteException error code : {}", mwe.getCode());
-  //     LOG.debug("MongoWriteException error label : {}", mwe.getErrorLabels());
-  //     if (mwe.getCode() == 11000) {
-  //       throw new InvalidInputException("Duplicate Key, Product Id: " + body.getProductId());
-  //     }
-  //     throw mwe;
-  //   } catch (Exception e) {
-  //     LOG.debug("error message : {}", e.getMessage());
-  //     LOG.debug("error class : {}", e.getClass());
-  //     LOG.debug("error localized Message : {}", e.getLocalizedMessage());
-  //     // throw new InvalidInputException("Duplicate Key, Product Id: " +
-  //     // body.getProductId());
-  //     throw e;
-  //   }
-  // }
+   @Override
+   public Product createProduct(Product body) {
+	   if (body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
+	   
+	   ProductEntity entity = mapper.apiToEntity(body);
+	   Mono<Product> newEntity = repository.save(entity)
+			   .log()
+			   .onErrorMap(DuplicateKeyException.class,
+					   ex -> new InvalidInputException("Duplicated key, Product Id: " + body.getProductId()))
+			   .map(e -> mapper.entityToApi(e));
+	   
+	   return newEntity.block();
+			   
+   }
 
-  // @Override
-  // public void deleteProduct(int productId) {
-  //   repository.findByProductId(productId).ifPresent(e -> repository.delete(e));
+   @Override
+   public void deleteProduct(int productId) {
+	   
+	   if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
+	   
+	   repository.findByProductId(productId).log().map(e -> repository.delete(e)).flatMap(e -> e).block();
 
-  // }
+   }
 
 }

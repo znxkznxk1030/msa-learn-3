@@ -1579,7 +1579,7 @@ protected List<Review> getByProductId(int productId) {
   List<ReviewEntity> entityList = repository.findByProductId(productId);
   List<Review> list = mapper.entityListToApiList(entityList);
   list.forEach(e -> e.setServiceAddress(serviceUtil.getServiceAddress()));
-  
+
   return list;
  }
 ```
@@ -1587,9 +1587,9 @@ protected List<Review> getByProductId(int productId) {
 ```java
 @Override
  public Flux<Review> getReviews(int productId) {
-  
+
   if ( productId < 1 ) throw new InvalidInputException("Invalid productId: " + productId);
-  
+
   return asyncFlux(getByProductId(productId)).log();
  }
 ```
@@ -1620,11 +1620,40 @@ protected List<Review> getByProductId(int productId) {
   }
 ```
 
+#### 각 마이크로 서비스의 create 변경
+
+```java
+  @Override
+  public Product createProduct(Product body) {
+    if (body.getProductId() < 1) throw new InvalidInputException("Invalid productId: " + body.getProductId());
+    ProductEntity entity = mapper.apiToEntity(body);
+
+    Mono<Product> newEntity = repository.save(entity)
+       .log()
+       .onErrorMap(DuplicateKeyException.class,
+          ex -> new InvalidInputException("Duplicated key, Product Id: " + body.getProductId()))
+       .map(e -> mapper.entityToApi(e));
+       
+    return newEntity.block();
+  }
+```
+
+#### 각 마이크로 서비스의 delete 변경
+
+```java
+  @Override
+  public void deleteProduct(int productId) {
+    if (productId < 1) throw new InvalidInputException("Invalid productId: " + productId);
+
+    repository.findByProductId(productId).log().map(e -> repository.delete(e)).flatMap(e -> e).block();
+  }
+```
+
 #### getCompositeProduct 변경
 
 ```java
 public Mono<ProductAggregate> getCompositeProduct(int productId) {
-  return Mono.zip(values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1], (List<Review>) values[2], serviceUtil.getServiceAddress()), 
+  return Mono.zip(values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1], (List<Review>) values[2], serviceUtil.getServiceAddress()),
   integration.getProduct(productId),
   integration.getRecommendations(productId).collectList(),
   integration.getReviews(productId).collectList())

@@ -120,10 +120,10 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   }
 
   @Override
-  public Flux<Review> getReviews(int productId) {
-	  String url = reviewServiceUrl + "/reivew?productId=" + productId;
+  public Flux<Recommendation> getRecommendations(int productId) {
+    String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
 
-	  return webClient.get().uri(url).retrieve().bodyToFlux(Review.class).log().onErrorResume(error -> empty());
+    return webClient.get().uri(url).retrieve().bodyToFlux(Recommendation.class).log().onErrorResume(error -> empty());
   }
 
   @Override
