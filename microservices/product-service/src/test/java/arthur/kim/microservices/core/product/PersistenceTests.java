@@ -1,30 +1,18 @@
 package arthur.kim.microservices.core.product;
 
 //import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import arthur.kim.api.product.Product;
 import arthur.kim.microservices.core.product.persistence.ProductEntity;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
 import reactor.test.StepVerifier;
@@ -34,8 +22,8 @@ import static java.util.stream.IntStream.rangeClosed;
 @ExtendWith(SpringExtension.class)
 @DataMongoTest
 @WebAppConfiguration
-// @TestInstance(Lifecycle.PER_CLASS)
 @EnableSpringDataWebSupport
+//@SpringBootTest
 public class PersistenceTests {
 
   @Autowired

@@ -1497,6 +1497,10 @@ Enter password:
 
 ### MongoDb | ReactiveCrudRepository 로 변경
 
+```groovy
+implementation('org.springframework.boot:spring-boot-starter-data-mongodb-reactive') // 꼭 넣기
+```
+
 - 이제 영속성 메소드가 Mono나 Flux 객체를 반환하므로, 메서드는 반환된 리액티브 객체에서 결과를 받을 때까지 기다려야 한다.
 - block() 메소드를 직접 호출해서 결과를 받을 때 까지 기다리거나,
 - StepVerifier 헬퍼 클래스를 사용하여 검증
@@ -1633,7 +1637,7 @@ protected List<Review> getByProductId(int productId) {
        .onErrorMap(DuplicateKeyException.class,
           ex -> new InvalidInputException("Duplicated key, Product Id: " + body.getProductId()))
        .map(e -> mapper.entityToApi(e));
-       
+
     return newEntity.block();
   }
 ```

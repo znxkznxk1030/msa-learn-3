@@ -15,15 +15,15 @@ public interface ProductService {
     )
     Mono<Product> getProduct(@PathVariable int productId);
     
-    @PostMapping(
-    		value = "/product",
-    		consumes = "application/json",
-    		produces = "application/json"
-    )
+//    @PostMapping(
+//    		value = "/product",
+//    		consumes = "application/json",
+//    		produces = "application/json"
+//    )
     Product createProduct(@RequestBody Product body);
-    
-    @DeleteMapping(
-    		value = "/product/{productId}"
-    )
+//    
+//    @DeleteMapping(
+//    		value = "/product/{productId}"
+//    )
     void deleteProduct(@PathVariable int productId);
 }
