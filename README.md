@@ -1708,3 +1708,31 @@ spring.cloud.stream:
     destination: products
     group: productsGroup
 ```
+
+- 스트림은 group 필드를 사용해 product 마이크로 서비스의 모든 인스턴스를 productsGroup이라는 소비자 그룹으로 묶는다
+
+###### 재시도 및 데드 레터 대기열
+
+- 소비자가 메시지 처리에 실패하면 메시지는 실패한 소비자가 성공적으로 처리할 때까지 대기열로 다시 보내지거나 사라진다.
+- 내용이 잘못된 메시지 (poison message)인 경우엔 수동으로 메시지를 제거할 때까지 다른 메시지를 처리하지 못하도록 소비자를 차단한다.
+- 일시적인 문제로 실패한 경우에는 여러번의 재시도로 처리가 성공할 수 있다.
+- 소비자( e.g. product ) 측에 스프링 클라우드 스트림을 구성한다.
+
+```yml
+spring.cloud.stream.bindings.input.consumer:
+  maxAttempts: 3 # 3번 시도
+  backOffInitialInterval: 500 # 첫번째 시도
+  backOffMaxInterval: 1000 # 두번째 시도
+  backOffMultiplier: 2.0
+
+# RabbitMQ
+spring.cloud.stream.rabbit.bindings.input.consumer:
+  autoBindDlq: true
+  republishToDlq: true
+
+# kafka
+spring.cloud.stream.kafka.bindings.input.consumer:
+  enableDlq: true
+```
+
+###### 순서 보장 및 파티션
