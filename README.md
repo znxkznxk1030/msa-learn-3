@@ -1665,3 +1665,46 @@ public Mono<ProductAggregate> getCompositeProduct(int productId) {
  .log();
 }
 ```
+
+### 이벤트 기반 비동기 서비스 개발
+
+- 복합 서비스는 생성 및 삭제 이벤트를 각 핵심 서비스의 토픽에 게시한 수 핵심 서비스의 처리를 기다리지 않고 호출자에게 OK 응답을 반환한다.
+
+1. 스프링 클라우드 스트림 구성
+2. 토픽 및 이벤트 정의
+3. 그래들 빌드 파일 변경
+4. 복합 서비스에서 이벤트 게시
+5. 핵심 서비스에서 이벤트 소비
+
+#### 메시징 관련 문제를 처리하도록 스프링 클라우드 스트림 구성
+
+- Example
+
+```java
+// 게시
+mysource.output().send(MessageBuilder.withPlayload(message).build);
+
+// 소비
+@StreamListener(target = Sink.INPUT)
+public void receive(MyMessage message) {
+  LOG.info("Received: {}", message);
+}
+
+```
+
+##### 스프링 클라우드 스트림 기능
+
+- 소비자 그룹
+- 재시도 및 데드 레터 대기열
+- 순서 보장 및 파티션
+
+###### 소비자 그룹
+
+- 마이크로 서비스의 모든 인스턴스가 같은 메시지를 소비하는 문제를 해결
+
+```yml
+spring.cloud.stream:
+  binding.input:
+    destination: products
+    group: productsGroup
+```
