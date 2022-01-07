@@ -1736,3 +1736,30 @@ spring.cloud.stream.kafka.bindings.input.consumer:
 ```
 
 ###### 순서 보장 및 파티션
+
+- 파티션을 사용하면 성능과 확장성을 잃지 않으면서도 전송됐을 때의 순서 그대로 메시지를 전달할 수 있다.
+- 메시징 시스템이 같은 키를 가진 메시지 사이의 순서를 보장하고자 사용할 키를 각 메시지에 지정한다.
+- 같은 키를 가진 메시지는 언제나 같은 파티션에 배치되며, 하나의 동일 파티션에 속한 메시지만 전달 순서가 보장된다.
+- 메시지 순서 보장을 위해 소비자 그룹 안의 각 파티션마다 하나의 소비자 인스턴스가 배정된다.
+- 게시자 ( e.g. product-composite ) 에서 키 및 파티션 수를 지정해야 한다.
+
+```yml
+spring.cloud.stream.binding.output:
+  destination: products
+  producer:
+    partition-key-expression: payload.key # 메시지 페이로드의 key 필드
+    partition-count: 2 
+```
+
+- 소비자( e.g. product ) 에서 소비할 파티션을 지정할 수 있다.
+
+```yml
+spring.cloud.stream.binding.input:
+  destination: products
+  group: productsGroup
+  consumer:
+    partitioned: true
+    instance-index: 0
+```
+
+소비자가 첫 번째 파티션 ( 0 )의 메시지만 소비한다는 것을 스프링 클라우드 스트림에 알린다.
