@@ -1748,7 +1748,7 @@ spring.cloud.stream.binding.output:
   destination: products
   producer:
     partition-key-expression: payload.key # 메시지 페이로드의 key 필드
-    partition-count: 2 
+    partition-count: 2
 ```
 
 - 소비자( e.g. product ) 에서 소비할 파티션을 지정할 수 있다.
@@ -1763,3 +1763,61 @@ spring.cloud.stream.binding.input:
 ```
 
 소비자가 첫 번째 파티션 ( 0 )의 메시지만 소비한다는 것을 스프링 클라우드 스트림에 알린다.
+
+###### 토픽 및 이벤트 정의
+
+- 스프링 클라우드 스트림은 게시 및 구독 패턴을 기반으로 한다.
+- 즉, 게시자는 토픽에 메시지를 게시하고 구독자는 관심 있는 토픽을 구독해 메시지를 수신한다.
+- 엔티티 유현별로 "products, recommendations, reviews"등의 토픽 사용
+- 이벤트란 "어떤 상황이 발생했다는 것을 설명하는 메시지"
+
+이벤트 정의
+
+- type ( 생성, 삭제 )
+- key ( productId )
+- data ( 실제 이벤트 데이터 )
+- timestamp ( 이벤트 발생 시간 )
+
+```java
+// api.event.Event
+public class Event<K, T> {
+
+    public enum Type { CREATE, DELETE }
+
+    private Event.Type eventType;
+    private K key;
+    private T data;
+    private LocalDateTime eventCreatedAt;
+
+    public Event() {
+      this.eventType = null;
+      this.key = null;
+      this.data = null;
+      this.eventCreatedAt = null;
+    }
+
+    public Event(Type eventType, K key, T data) {
+      this.eventType = eventType;
+      this.key = key;
+      this.data = data;
+      this.eventCreatedAt = now();
+    }
+
+    public Type getEventType() {
+      return eventType;
+    }
+
+    public K getKey() {
+      return key;
+    }
+
+    public T getData() {
+      return data;
+    }
+
+    public LocalDateTime getEventCreatedAt() {
+      return eventCreatedAt;
+    }
+}
+
+```
