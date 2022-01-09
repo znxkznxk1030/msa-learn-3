@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -44,6 +46,24 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private final String productServiceUrl;
   private final String recommendationServiceUrl;
   private final String reviewServiceUrl;
+
+  private MessageSources messageSources;
+  
+  public interface MessageSources {
+	  
+	  String OUTPUT_PRODUCTS = "output-products";
+	  String OUTPUT_RECOMMENDATIONS = "output-recommendations";
+	  String OUTPUT_REVIEWS = "output-reviews";
+	  
+	  @Output(OUTPUT_PRODUCTS)
+	  MessageChannel outputProducts();
+	  
+	  @Output(OUTPUT_RECOMMENDATIONS)
+	  MessageChannel outputRecommendations();
+	  
+	  @Output(OUTPUT_REVIEWS)
+	  MessageChannel outputReviews();
+  }
 
   @Autowired
   public ProductCompositeIntegration(
@@ -87,11 +107,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Override
   public void deleteProduct(int productId) {
-    try {
-      restTemplate.delete(productServiceUrl + "/" + productId);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+	  
   }
 
   @Override

@@ -1698,7 +1698,7 @@ public void receive(MyMessage message) {
 - 재시도 및 데드 레터 대기열
 - 순서 보장 및 파티션
 
-###### 소비자 그룹
+##### 소비자 그룹
 
 - 마이크로 서비스의 모든 인스턴스가 같은 메시지를 소비하는 문제를 해결
 
@@ -1711,7 +1711,7 @@ spring.cloud.stream:
 
 - 스트림은 group 필드를 사용해 product 마이크로 서비스의 모든 인스턴스를 productsGroup이라는 소비자 그룹으로 묶는다
 
-###### 재시도 및 데드 레터 대기열
+##### 재시도 및 데드 레터 대기열
 
 - 소비자가 메시지 처리에 실패하면 메시지는 실패한 소비자가 성공적으로 처리할 때까지 대기열로 다시 보내지거나 사라진다.
 - 내용이 잘못된 메시지 (poison message)인 경우엔 수동으로 메시지를 제거할 때까지 다른 메시지를 처리하지 못하도록 소비자를 차단한다.
@@ -1735,7 +1735,7 @@ spring.cloud.stream.kafka.bindings.input.consumer:
   enableDlq: true
 ```
 
-###### 순서 보장 및 파티션
+##### 순서 보장 및 파티션
 
 - 파티션을 사용하면 성능과 확장성을 잃지 않으면서도 전송됐을 때의 순서 그대로 메시지를 전달할 수 있다.
 - 메시징 시스템이 같은 키를 가진 메시지 사이의 순서를 보장하고자 사용할 키를 각 메시지에 지정한다.
@@ -1764,7 +1764,7 @@ spring.cloud.stream.binding.input:
 
 소비자가 첫 번째 파티션 ( 0 )의 메시지만 소비한다는 것을 스프링 클라우드 스트림에 알린다.
 
-###### 토픽 및 이벤트 정의
+##### 토픽 및 이벤트 정의
 
 - 스프링 클라우드 스트림은 게시 및 구독 패턴을 기반으로 한다.
 - 즉, 게시자는 토픽에 메시지를 게시하고 구독자는 관심 있는 토픽을 구독해 메시지를 수신한다.
@@ -1821,3 +1821,31 @@ public class Event<K, T> {
 }
 
 ```
+
+#### 그래들 빌드 파일 변경
+
+```groovy
+// product-composite
+ext {
+  springCloudVersion = 'Greenwich.RELEASE'
+}
+
+dependencies {
+  implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+  implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+  testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+  }
+}
+```
+
+#### 복합 서비스에서 이벤트 게시
+
+1. 메시지 소스를 선언하고 통합 계층에서 이벤트를 게시한다.
+2. 이벤트 게시를 위한 구성을 추가한다.
+3. 이벤트 게시를 테스트할 수 있도록 테스트를 변경한다.
+
