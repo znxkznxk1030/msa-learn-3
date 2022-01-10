@@ -1873,7 +1873,7 @@ dependencyManagement {
   }
 ```
 
-
+- 통합계층에서 이벤트 게시
 
 ```java
   @Override
@@ -1888,4 +1888,25 @@ dependencyManagement {
     Event<Integer, Review> event = new Event<Integer, Review>(DELETE, productId, null);
     messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
   }
+```
+
+##### 2. 이벤트 게시를 위한 구성 추가
+
+```yml
+spring.cloud.stream:
+  defaultBinder: rabbit
+  default.contentType: application/json
+  bindings:
+    output-products:
+      destination: products
+      producer:
+        required-groups: auditGroup
+    output-recommendations:
+      destination: recommendations
+      producer:
+        required-groups: auditGroup
+    output-reviews:
+      destination: reviews
+      producer:
+        required-groups: auditGroup
 ```

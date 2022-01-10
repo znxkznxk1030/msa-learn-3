@@ -16,6 +16,7 @@ import arthur.kim.microservices.core.recommendation.persistence.RecommendationRe
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.http.ServiceUtil;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 public class RecommendationServiceImpl implements RecommendationService {
@@ -52,38 +53,27 @@ public class RecommendationServiceImpl implements RecommendationService {
 
   @Override
   public Recommendation createRecommendation(Recommendation body) {
-    // TODO Auto-generated method stub
-    return null;
+    if (body.getProductId() < 1)
+      throw new InvalidInputException("Invalid productId: " + body.getProductId());
+
+    RecommendationEntity entity = mapper.apiToEntity(body);
+    Mono<Recommendation> newEntity = repository.save(entity)
+        .log()
+        .onErrorMap(
+            DuplicateKeyException.class,
+            ex -> new InvalidInputException("Duplicate key, Product Id: " + body.getProductId() + ", Recommendation Id:"
+                + body.getRecommendationId()))
+        .map(e -> mapper.entityToApi(e));
+
+    return newEntity.block();
   }
 
   @Override
   public void deleteRecommendations(int productId) {
-    // TODO Auto-generated method stub
-    
+    if (productId < 1)
+      throw new InvalidInputException("Invalid productId: " + productId);
+
+    LOG.debug("deleteRecommendations: tries to delete recommendations for the product with productId: {}", productId);
+    repository.deleteAll(repository.findByProductId(productId)).block();
   }
-
-  // @Override
-  // public Recommendation createRecommendation(Recommendation body) {
-  //   try {
-  //     RecommendationEntity entity = mapper.apiToEntity(body);
-  //     RecommendationEntity newEntity = repository.save(entity);
-
-  //     LOG.debug("createRecommendation: created a recommendation entity: {}/{}", body.getProductId(),
-  //         body.getRecommendationId());
-
-  //     return mapper.entityToApi(newEntity);
-  //   } catch (DuplicateKeyException dke) {
-  //     throw new InvalidInputException(
-  //         "Duplicate Key, Product Id: " + body.getProductId() + ", Recommendation Id: " + body.getRecommendationId());
-  //   } catch (Exception e) {
-  //     throw new InvalidInputException(
-  //         "Duplicate Key, Product Id: " + body.getProductId() + ", Recommendation Id: " + body.getRecommendationId());
-  //   }
-  // }
-
-  // @Override
-  // public void deleteRecommendations(int productId) {
-  //   LOG.debug("deleteRecommendation: tried to delete recommendations for the product with productId: {}", productId);
-  //   repository.deleteAll(repository.findByProductId(productId));
-  // }
 }
