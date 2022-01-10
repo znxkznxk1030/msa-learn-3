@@ -1849,3 +1849,43 @@ dependencyManagement {
 2. 이벤트 게시를 위한 구성을 추가한다.
 3. 이벤트 게시를 테스트할 수 있도록 테스트를 변경한다.
 
+##### 1. 메시지 소스를 선언하고 통합 계층에서 이벤트 게시
+
+- 메시지 소스 선언
+
+```java
+  private MessageSources messageSources;
+
+  public interface MessageSources {
+
+    String OUTPUT_PRODUCTS = "output-products";
+    String OUTPUT_RECOMMENDATIONS = "output-recommendations";
+    String OUTPUT_REVIEWS = "output-reviews";
+
+    @Output(OUTPUT_PRODUCTS)
+    MessageChannel outputProducts();
+
+    @Output(OUTPUT_RECOMMENDATIONS)
+    MessageChannel outputRecommendations();
+
+    @Output(OUTPUT_REVIEWS)
+    MessageChannel outputReviews();
+  }
+```
+
+
+
+```java
+  @Override
+  public Review createReview(Review body) {
+    Event<Integer, Review> event = new Event<Integer, Review>(CREATE, body.getProductId(), body);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
+    return body;
+  }
+
+  @Override
+  public void deleteReviews(int productId) {
+    Event<Integer, Review> event = new Event<Integer, Review>(DELETE, productId, null);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
+  }
+```

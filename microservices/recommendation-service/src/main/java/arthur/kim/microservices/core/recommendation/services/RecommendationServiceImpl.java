@@ -50,6 +50,18 @@ public class RecommendationServiceImpl implements RecommendationService {
         });
   }
 
+  @Override
+  public Recommendation createRecommendation(Recommendation body) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void deleteRecommendations(int productId) {
+    // TODO Auto-generated method stub
+    
+  }
+
   // @Override
   // public Recommendation createRecommendation(Recommendation body) {
   //   try {

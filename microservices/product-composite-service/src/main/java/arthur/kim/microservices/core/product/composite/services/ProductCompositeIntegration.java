@@ -5,15 +5,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.MessageChannel;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import arthur.kim.api.event.Event;
 import arthur.kim.api.product.Product;
 import arthur.kim.api.product.ProductService;
 import arthur.kim.api.recommendation.Recommendation;
@@ -32,6 +35,8 @@ import java.util.List;
 
 import static org.springframework.http.HttpMethod.GET;
 import static reactor.core.publisher.Flux.empty;
+import static arthur.kim.api.event.Event.Type.CREATE;
+import static arthur.kim.api.event.Event.Type.DELETE;
 
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
@@ -48,21 +53,21 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private final String reviewServiceUrl;
 
   private MessageSources messageSources;
-  
+
   public interface MessageSources {
-	  
-	  String OUTPUT_PRODUCTS = "output-products";
-	  String OUTPUT_RECOMMENDATIONS = "output-recommendations";
-	  String OUTPUT_REVIEWS = "output-reviews";
-	  
-	  @Output(OUTPUT_PRODUCTS)
-	  MessageChannel outputProducts();
-	  
-	  @Output(OUTPUT_RECOMMENDATIONS)
-	  MessageChannel outputRecommendations();
-	  
-	  @Output(OUTPUT_REVIEWS)
-	  MessageChannel outputReviews();
+
+    String OUTPUT_PRODUCTS = "output-products";
+    String OUTPUT_RECOMMENDATIONS = "output-recommendations";
+    String OUTPUT_REVIEWS = "output-reviews";
+
+    @Output(OUTPUT_PRODUCTS)
+    MessageChannel outputProducts();
+
+    @Output(OUTPUT_RECOMMENDATIONS)
+    MessageChannel outputRecommendations();
+
+    @Output(OUTPUT_REVIEWS)
+    MessageChannel outputReviews();
   }
 
   @Autowired
@@ -90,25 +95,29 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     reviewServiceUrl = "http://" + reviewServiceHost + ":" + reviewServicePort + "/review";
   }
 
+  // Product Service
+
   @Override
   public Mono<Product> getProduct(int productId) {
-	  String url = productServiceUrl + "/product/" + productId;
-	  return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log().onErrorMap(WebClientResponseException.class, ex -> handleException(ex));
+    String url = productServiceUrl + "/product/" + productId;
+    return webClient.get().uri(url).retrieve().bodyToMono(Product.class).log()
+        .onErrorMap(WebClientResponseException.class, ex -> handleException(ex));
   }
 
   @Override
   public Product createProduct(Product body) {
-    try {
-      return restTemplate.postForObject(productServiceUrl, body, Product.class);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+    Event<Integer, Product> event = new Event<Integer, Product>(CREATE, body.getProductId(), body);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
+    return body;
   }
 
   @Override
   public void deleteProduct(int productId) {
-	  
+    Event<Integer, Product> event = new Event<Integer, Product>(DELETE, productId, null);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
   }
+
+  // Recommendation Service
 
   @Override
   public Flux<Recommendation> getRecommendations(int productId) {
@@ -119,56 +128,49 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
 
   @Override
   public Recommendation createRecommendation(Recommendation body) {
-    try {
-      return restTemplate.postForObject(recommendationServiceUrl, body, Recommendation.class);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+    Event<Integer, Recommendation> event = new Event<Integer, Recommendation>(CREATE, body.getProductId(), body);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
+    return body;
   }
 
   @Override
   public void deleteRecommendations(int productId) {
-    try {
-      restTemplate.delete(recommendationServiceUrl + "?productId=" + productId);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+    Event<Integer, Recommendation> event = new Event<Integer, Recommendation>(DELETE, productId, null);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
   }
 
-  @Override
-  public Flux<Recommendation> getRecommendations(int productId) {
-    String url = recommendationServiceUrl + "/recommendation?productId=" + productId;
+  // Review Service
 
-    return webClient.get().uri(url).retrieve().bodyToFlux(Recommendation.class).log().onErrorResume(error -> empty());
+  @Override
+  public Flux<Review> getReviews(int productId) {
+    String url = reviewServiceUrl + "/review?productId=" + productId;
+    return webClient.get().uri(url).retrieve().bodyToFlux(Review.class).log().onErrorResume(error -> empty());
   }
 
   @Override
   public Review createReview(Review body) {
-    try {
-      return restTemplate.postForObject(reviewServiceUrl, body, Review.class);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+    Event<Integer, Review> event = new Event<Integer, Review>(CREATE, body.getProductId(), body);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
+    return body;
   }
 
   @Override
   public void deleteReviews(int productId) {
-    try {
-      restTemplate.delete(reviewServiceUrl + "?productId=" + productId);
-    } catch (HttpClientErrorException ex) {
-      throw handleHttpClientException(ex);
-    }
+    Event<Integer, Review> event = new Event<Integer, Review>(DELETE, productId, null);
+    messageSources.outputProducts().send(MessageBuilder.withPayload(event).build());
   }
-  
+
+  // Exceptions
+
   private Throwable handleException(Throwable ex) {
-	  if (!(ex instanceof WebClientResponseException)) {
-		  LOG.warn("Got a unexpected error: {}, will rethrow it", ex.toString());
-          return ex;
-	  }
-	  
-	  WebClientResponseException wcre = (WebClientResponseException) ex;
-	  
-	  switch (wcre.getStatusCode()) {
+    if (!(ex instanceof WebClientResponseException)) {
+      LOG.warn("Got a unexpected error: {}, will rethrow it", ex.toString());
+      return ex;
+    }
+
+    WebClientResponseException wcre = (WebClientResponseException) ex;
+
+    switch (wcre.getStatusCode()) {
 
       case NOT_FOUND:
         return new NotFoundException(getErrorMessage(wcre));
@@ -199,6 +201,8 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     }
   }
 
+  // Error Messages
+
   private String getErrorMessage(HttpClientErrorException ex) {
     try {
       return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
@@ -206,12 +210,12 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
       return ex.getMessage();
     }
   }
-  
+
   private String getErrorMessage(WebClientResponseException ex) {
-	    try {
-	      return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
-	    } catch (IOException ioex) {
-	      return ex.getMessage();
-	    }
-	  }
+    try {
+      return mapper.readValue(ex.getResponseBodyAsString(), HttpErrorInfo.class).getMessage();
+    } catch (IOException ioex) {
+      return ex.getMessage();
+    }
+  }
 }

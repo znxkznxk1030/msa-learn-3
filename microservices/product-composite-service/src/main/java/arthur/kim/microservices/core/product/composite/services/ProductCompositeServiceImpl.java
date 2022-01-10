@@ -40,14 +40,16 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
       if (body.getRecommendations() != null) {
         body.getRecommendations().forEach(r -> {
-          Recommendation recommendation = new Recommendation(body.getProductId(), r.getRecommendationId(), r.getAuthor(), r.getRate(), r.getContent(), null);
+          Recommendation recommendation = new Recommendation(body.getProductId(), r.getRecommendationId(),
+              r.getAuthor(), r.getRate(), r.getContent(), null);
           integration.createRecommendation(recommendation);
         });
       }
 
       if (body.getReviews() != null) {
         body.getReviews().forEach(r -> {
-          Review review = new Review(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(), r.getContent(), null);
+          Review review = new Review(body.getProductId(), r.getReviewId(), r.getAuthor(), r.getSubject(),
+              r.getContent(), null);
           integration.createReview(review);
         });
       }
@@ -62,26 +64,34 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
   @Override
   public void deleteCompositeProduct(int productId) {
-    LOG.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
+    try {
 
-    integration.deleteProduct(productId);
+      LOG.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
 
-    integration.deleteRecommendations(productId);
+      integration.deleteProduct(productId);
+      integration.deleteRecommendations(productId);
+      integration.deleteReviews(productId);
 
-    integration.deleteReviews(productId);
+      LOG.debug("deleteCompositeProduct: aggregate entities deleted for productId: {}", productId);
 
-    LOG.debug("getCompositeProduct: aggregate entities deleted for productId: {}", productId);
+    } catch (RuntimeException re) {
+      LOG.warn("deleteCompositeProduct failed: {}", re.toString());
+      throw re;
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Mono<ProductAggregate> getCompositeProduct(int productId) {
-	  return Mono.zip(values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1], (List<Review>) values[2], serviceUtil.getServiceAddress()), 
-			  integration.getProduct(productId),
-			  integration.getRecommendations(productId).collectList(),
-			  integration.getReviews(productId).collectList())
-			 .doOnError(ex -> LOG.warn("getCompositeProduct failed: {}", ex.toString()))
-			 .log();
+    return Mono
+        .zip(
+            values -> createProductAggregate((Product) values[0], (List<Recommendation>) values[1],
+                (List<Review>) values[2], serviceUtil.getServiceAddress()),
+            integration.getProduct(productId),
+            integration.getRecommendations(productId).collectList(),
+            integration.getReviews(productId).collectList())
+        .doOnError(ex -> LOG.warn("getCompositeProduct failed: {}", ex.toString()))
+        .log();
   }
 
   private ProductAggregate createProductAggregate(Product product, List<Recommendation> recommendations,
