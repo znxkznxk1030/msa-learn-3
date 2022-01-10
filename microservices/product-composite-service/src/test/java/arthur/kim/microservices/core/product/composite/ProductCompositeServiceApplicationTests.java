@@ -22,6 +22,8 @@ import arthur.kim.api.review.Review;
 import arthur.kim.microservices.core.product.composite.services.ProductCompositeIntegration;
 import arthur.kim.util.exceptions.InvalidInputException;
 import arthur.kim.util.exceptions.NotFoundException;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import static reactor.core.publisher.Mono.just;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -42,12 +44,19 @@ class ProductCompositeServiceApplicationTests {
 
   @BeforeEach
   public void setup() {
+
     when(compositeIntegration.getProduct(PRODUCT_ID_OK))
-        .thenReturn(new Product(PRODUCT_ID_OK, "name", 1, "mock-address"));
+        .thenReturn(Mono.just(new Product(PRODUCT_ID_OK, "name", 1, "mock-address")));
+    /*
+     * Collections.singletonList()
+     * 변경여부 : immutable (불변)
+     * 사이즈 : size가 1로 고정됨(지정된 단일 객체를 가르키는 주소값을 가지기 때문)
+     * 값 및 구조적 변경 시 UnsupportedOperationException 발생
+     */
     when(compositeIntegration.getRecommendations(PRODUCT_ID_OK))
-        .thenReturn(singletonList(new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address")));
+        .thenReturn(Flux.fromIterable(singletonList(new Recommendation(PRODUCT_ID_OK, 1, "author", 1, "content", "mock address"))));
     when(compositeIntegration.getReviews(PRODUCT_ID_OK))
-        .thenReturn(singletonList(new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address")));
+        .thenReturn(Flux.fromIterable(singletonList(new Review(PRODUCT_ID_OK, 1, "author", "subject", "content", "mock address"))));
 
     when(compositeIntegration.getProduct(PRODUCT_ID_NOT_FOUND))
         .thenThrow(new NotFoundException("NOT FOUND: " + PRODUCT_ID_NOT_FOUND));
