@@ -1910,3 +1910,22 @@ spring.cloud.stream:
       producer:
         required-groups: auditGroup
 ```
+##### TypeSafeMatcher 를 이용하여 Matcher Test하기
+
+```java
+public class IsSameEvent extends TypeSafeMatcher<String> {
+
+  @Override
+  protected boolean matchesSafely(String item) {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
+  @Override
+  public void describeTo(Description description) {
+    // TODO Auto-generated method stub
+
+  }
+
+}
+```
