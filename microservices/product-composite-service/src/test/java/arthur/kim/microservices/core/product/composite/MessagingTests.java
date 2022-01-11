@@ -27,6 +27,11 @@ import static org.springframework.http.HttpStatus.OK;
 import static reactor.core.publisher.Mono.just;
 import static arthur.kim.api.event.Event.Type.CREATE;
 import static arthur.kim.api.event.Event.Type.DELETE;
+import static arthur.kim.microservices.core.product.composite.IsSameEvent.sameEventExceptCreatedAt;
+
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class MessagingTests {
@@ -70,7 +75,7 @@ public class MessagingTests {
 
     Event<Integer, Product> expectedEvent = new Event(CREATE, composite.getProductId(),
         new Product(composite.getProductId(), composite.getName(), composite.getWeight(), null));
-    // assertThat(queueProducts, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedEvent))));
+    assertThat(queueProducts, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedEvent))));
 
     // Assert none recommendations and review events
     assertEquals(0, queueRecommendations.size());
