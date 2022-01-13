@@ -23,7 +23,6 @@ import static java.util.stream.IntStream.rangeClosed;
 @DataMongoTest
 @WebAppConfiguration
 @EnableSpringDataWebSupport
-//@SpringBootTest
 public class PersistenceTests {
 
   @Autowired

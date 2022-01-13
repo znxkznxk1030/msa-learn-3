@@ -1,4 +1,4 @@
-package arthur.kim.microservices.core.review.services;
+package arthur.kim.microservices.core.recommendation.services;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +8,8 @@ import org.springframework.cloud.stream.annotation.StreamListener;
 import org.springframework.cloud.stream.messaging.Sink;
 
 import arthur.kim.api.event.Event;
-import arthur.kim.api.review.Review;
-import arthur.kim.api.review.ReviewService;
+import arthur.kim.api.recommendation.Recommendation;
+import arthur.kim.api.recommendation.RecommendationService;
 import arthur.kim.util.exceptions.EventProcessingException;
 
 @EnableBinding(Sink.class)
@@ -17,24 +17,24 @@ public class MessageProcessor {
 
   private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
-  private final ReviewService reviewService;
+  private final RecommendationService recommendationService;
 
   @Autowired
-  public MessageProcessor(ReviewService reviewService) {
-    this.reviewService = reviewService;
+  public MessageProcessor(RecommendationService recommendationService) {
+    this.recommendationService = recommendationService;
   }
 
   @StreamListener(target = Sink.INPUT)
-  public void process(Event<Integer, Review> event) {
+  public void process(Event<Integer, Recommendation> event) {
 
     switch (event.getEventType()) {
       case CREATE:
-        Review review = event.getData();
-        reviewService.createReview(review);
+        Recommendation recommendation = event.getData();
+        recommendationService.createRecommendation(recommendation);
         break;
       case DELETE:
         int productId = event.getKey();
-        reviewService.deleteReviews(productId);
+        recommendationService.deleteRecommendations(productId);
         break;
       default:
         String errorMessage = "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";

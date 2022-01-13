@@ -1929,3 +1929,40 @@ public class IsSameEvent extends TypeSafeMatcher<String> {
 
 }
 ```
+
+#### 핵심 서비스에서 이벤트 소비
+
+1. 토픽의 이벤트 수신을 위해 메시지 프로세스를 선언한다.
+2. 리액티브 영속성 계층을 올바르게 사용하도록 서비스 구현을 변경한다.
+3. 이벤트 소비를 위한 구성을 추가한다.
+4. 이벤트의 비동기 처리를 테스트할 수 있도록 테스트를 변경한다.
+
+##### 1. 메시지 프로세서 선언
+
+```java
+@EnableBinding(Sink.class)
+public class MessageProcessor {
+  private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
+
+  @Autowired
+  private final ReviewService reviewService;
+
+  @StreamListener(target = Sink.INPUT)
+  public void process(Event<Integer, Review> event) {
+
+    switch (event.getEventType()) {
+      case CREATE:
+        Review review = event.getData();
+        reviewService.createReview(review);
+        break;
+      case DELETE:
+        int productId = event.getKey();
+        reviewService.deleteReviews(productId);
+        break;
+      default:
+        String errorMessage = "Incorrect event type: " + event.getEventType() + ", expected a CREATE or DELETE event";
+        throw new EventProcessingException(errorMessage);
+    }
+  }
+}
+```

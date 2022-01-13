@@ -13,6 +13,7 @@ sourceCompatibility = '11'
 
 ext {
 	mapstructVersion = "1.4.0.Beta3"
+  springCloudVersion = "Hoxton.SR6"
 }
 
 repositories {
@@ -29,6 +30,11 @@ dependencies {
     
     implementation project(':api')
     implementation project(':util')
+
+    // spring-cloud-stream
+    implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
+	  implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+    testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
     
     // mapstruct
     implementation "org.mapstruct:mapstruct:${mapstructVersion}"
@@ -43,6 +49,12 @@ dependencies {
     // test
     testImplementation('org.springframework.boot:spring-boot-starter-test')
     testImplementation 'io.projectreactor:reactor-test:3.1.0.RELEASE'
+}
+
+dependencyManagement {
+	imports {
+  	mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
 }
 
 test {
