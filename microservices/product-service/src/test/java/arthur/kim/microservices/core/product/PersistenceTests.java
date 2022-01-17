@@ -1,12 +1,10 @@
 package arthur.kim.microservices.core.product;
 
-//import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.web.config.EnableSpringDataWebSupport;
@@ -17,7 +15,6 @@ import arthur.kim.microservices.core.product.persistence.ProductEntity;
 import arthur.kim.microservices.core.product.persistence.ProductRepository;
 import reactor.test.StepVerifier;
 
-import static java.util.stream.IntStream.rangeClosed;
 
 @ExtendWith(SpringExtension.class)
 @DataMongoTest

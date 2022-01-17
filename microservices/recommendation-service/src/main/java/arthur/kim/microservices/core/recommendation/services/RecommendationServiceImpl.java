@@ -31,7 +31,7 @@ public class RecommendationServiceImpl implements RecommendationService {
 
   @Autowired
   public RecommendationServiceImpl(ServiceUtil serviceUtil, RecommendationMapper mapper,
-      RecommendationRepository repository) {
+    RecommendationRepository repository) {
     this.serviceUtil = serviceUtil;
     this.mapper = mapper;
     this.repository = repository;
