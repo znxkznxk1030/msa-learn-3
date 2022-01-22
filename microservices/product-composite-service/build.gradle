@@ -6,7 +6,7 @@ plugins {
 
 group = 'arthur.kim.microservices.core'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = 11
 
 ext {
   springCloudVersion = 'Greenwich.RELEASE'
@@ -24,7 +24,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.4'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.4'
 
-  	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'org.springframework.boot:spring-boot-starter-actuator'
+  implementation 'com.mchange:c3p0:0.9.5.5'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'

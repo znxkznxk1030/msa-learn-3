@@ -100,6 +100,9 @@ spring.rabbitmq:
   port: 5672
   username: guest
   password: guest
+
+management.health.random.enabled: false
+
 ---
 spring.config.activate.on-profile: docker
 server.port: 8080

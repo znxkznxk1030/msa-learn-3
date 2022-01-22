@@ -73,8 +73,9 @@ public class MessagingTests {
     // Assert one expected new product events queued up
     assertEquals(1, queueProducts.size());
 
-    Event<Integer, Product> expectedEvent = new Event(CREATE, composite.getProductId(),
+    Event<Integer, Product> expectedEvent = new Event<Integer, Product>(CREATE, composite.getProductId(),
         new Product(composite.getProductId(), composite.getName(), composite.getWeight(), null));
+
     assertThat(queueProducts, is(receivesPayloadThat(sameEventExceptCreatedAt(expectedEvent))));
 
     // Assert none recommendations and review events

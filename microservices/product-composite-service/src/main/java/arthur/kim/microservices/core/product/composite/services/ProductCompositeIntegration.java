@@ -44,7 +44,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private static final Logger LOG = LoggerFactory.getLogger(ProductCompositeIntegration.class);
 
   private final WebClient webClient;
-  private final RestTemplate restTemplate;
 
   private final ObjectMapper mapper;
 
@@ -73,7 +72,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   @Autowired
   public ProductCompositeIntegration(
       WebClient.Builder webClient,
-      RestTemplate restTemplate,
       ObjectMapper mapper,
 
       @Value("${app.product-service.host}") String productServiceHost,
@@ -86,7 +84,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
       @Value("${app.review-service.port}") int reviewServicePort) {
 
     this.webClient = webClient.build();
-    this.restTemplate = restTemplate;
     this.mapper = mapper;
 
     productServiceUrl = "http://" + productServiceHost + ":" + productServicePort + "/product/";

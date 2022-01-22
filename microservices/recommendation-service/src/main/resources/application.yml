@@ -1,4 +1,5 @@
 server.port: 7001
+server.error.include-message: always
 
 spring:
   data:
@@ -6,7 +7,6 @@ spring:
       host: localhost
       port: 27017
       database: recommendation-db
-      auto-index-creation: true
 
 spring.cloud.stream:
   defaultBinder: rabbit
@@ -45,12 +45,14 @@ logging:
 
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
+management.health.random.enabled: false
 ---
 spring:
   config.activate.on-profile: docker
   data:
     mongodb:
       host: mongodb
+
 
 server.port: 8080
 

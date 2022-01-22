@@ -830,6 +830,12 @@ dependencies {
 }
 ```
 
+#### mongodb 실행
+
+```bash
+brew services start mongodb-community
+```
+
 ### Entity
 
 #### mongodb
