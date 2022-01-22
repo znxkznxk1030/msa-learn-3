@@ -1,7 +1,5 @@
 package arthur.kim.microservices.core.recommendation.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -14,8 +12,6 @@ import arthur.kim.util.exceptions.EventProcessingException;
 
 @EnableBinding(Sink.class)
 public class MessageProcessor {
-
-  private static final Logger LOG = LoggerFactory.getLogger(MessageProcessor.class);
 
   private final RecommendationService recommendationService;
 

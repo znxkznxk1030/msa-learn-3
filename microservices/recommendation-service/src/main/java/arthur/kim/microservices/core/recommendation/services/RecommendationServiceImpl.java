@@ -1,7 +1,5 @@
 package arthur.kim.microservices.core.recommendation.services;
 
-import java.util.List;
-
 import com.mongodb.DuplicateKeyException;
 
 import org.slf4j.Logger;
@@ -31,24 +29,10 @@ public class RecommendationServiceImpl implements RecommendationService {
 
   @Autowired
   public RecommendationServiceImpl(ServiceUtil serviceUtil, RecommendationMapper mapper,
-    RecommendationRepository repository) {
+      RecommendationRepository repository) {
     this.serviceUtil = serviceUtil;
     this.mapper = mapper;
     this.repository = repository;
-  }
-
-  @Override
-  public Flux<Recommendation> getRecommendations(int productId) {
-    if (productId < 1)
-      throw new InvalidInputException("Invalid productId: " + productId);
-
-    return repository.findByProductId(productId)
-        .log()
-        .map(e -> mapper.entityToApi(e))
-        .map(e -> {
-          e.setServiceAddress(serviceUtil.getServiceAddress());
-          return e;
-        });
   }
 
   @Override
@@ -66,6 +50,20 @@ public class RecommendationServiceImpl implements RecommendationService {
         .map(e -> mapper.entityToApi(e));
 
     return newEntity.block();
+  }
+
+  @Override
+  public Flux<Recommendation> getRecommendations(int productId) {
+    if (productId < 1)
+      throw new InvalidInputException("Invalid productId: " + productId);
+
+    return repository.findByProductId(productId)
+        .log()
+        .map(e -> mapper.entityToApi(e))
+        .map(e -> {
+          e.setServiceAddress(serviceUtil.getServiceAddress());
+          return e;
+        });
   }
 
   @Override
