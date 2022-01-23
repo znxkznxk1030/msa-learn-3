@@ -101,8 +101,8 @@ spring.rabbitmq:
   username: guest
   password: guest
 
-management.health.random.enabled: false
-
+management.endpoint.health.show-details: "ALWAYS"
+management.endpoints.web.exposure.include: "*"
 ---
 spring.config.activate.on-profile: docker
 server.port: 8080

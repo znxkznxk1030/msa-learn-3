@@ -9,7 +9,7 @@ version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 11
 
 ext {
-  springCloudVersion = 'Greenwich.RELEASE'
+  springCloudVersion = '2020.0.0'
 }
 
 repositories {
@@ -24,8 +24,8 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-annotations:2.11.4'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.11.4'
 
-  implementation 'org.springframework.boot:spring-boot-starter-actuator'
-  implementation 'com.mchange:c3p0:0.9.5.5'
+  // Actuator
+  implementation group: 'org.springframework.boot', name: 'spring-boot-starter-actuator', version: '2.5.6'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
@@ -37,8 +37,8 @@ dependencies {
 	
 	// SPRING CLOUD STREAM
 	implementation('org.springframework.cloud:spring-cloud-starter-stream-rabbit')
-  	implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
-  	testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
+  implementation('org.springframework.cloud:spring-cloud-starter-stream-kafka')
+  testImplementation('org.springframework.cloud:spring-cloud-stream-test-support')
 }
 
 dependencyManagement {

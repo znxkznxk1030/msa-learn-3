@@ -18,19 +18,14 @@ import arthur.kim.api.event.Event;
 import arthur.kim.api.product.Product;
 import arthur.kim.microservices.core.product.composite.services.ProductCompositeIntegration;
 
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.cloud.stream.test.matcher.MessageQueueMatcher.receivesPayloadThat;
 import static org.springframework.http.HttpStatus.OK;
 import static reactor.core.publisher.Mono.just;
 import static arthur.kim.api.event.Event.Type.CREATE;
-import static arthur.kim.api.event.Event.Type.DELETE;
 import static arthur.kim.microservices.core.product.composite.IsSameEvent.sameEventExceptCreatedAt;
 
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)

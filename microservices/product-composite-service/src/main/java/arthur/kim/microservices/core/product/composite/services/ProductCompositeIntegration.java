@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.couchbase.CouchbaseProperties.Env;
+import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.Output;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.messaging.MessageChannel;
@@ -38,6 +39,7 @@ import static reactor.core.publisher.Flux.empty;
 import static arthur.kim.api.event.Event.Type.CREATE;
 import static arthur.kim.api.event.Event.Type.DELETE;
 
+@EnableBinding(ProductCompositeIntegration.MessageSources.class)
 @Component
 public class ProductCompositeIntegration implements ProductService, RecommendationService, ReviewService {
 
@@ -52,7 +54,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
   private final String reviewServiceUrl;
 
   private MessageSources messageSources;
-
+  
   public interface MessageSources {
 
     String OUTPUT_PRODUCTS = "output-products";
